@@ -113,6 +113,151 @@ const ADMIN_STORAGE_KEY = "tank-merge:admin-mode";
 function loadAdminMode() { try { adminMode = localStorage.getItem(ADMIN_STORAGE_KEY) === "true"; } catch {} }
 function saveAdminMode() { try { localStorage.setItem(ADMIN_STORAGE_KEY, adminMode ? "true" : "false"); } catch {} }
 loadAdminMode();
+
+const API_BASE = window.location.origin;
+const AUTH_TOKEN_KEY = 'tank-merge:auth-token';
+let currentUser = null;
+
+function getToken() { try { return localStorage.getItem(AUTH_TOKEN_KEY); } catch { return null; } }
+function setToken(t) { try { localStorage.setItem(AUTH_TOKEN_KEY, t); } catch {} }
+function clearToken() { try { localStorage.removeItem(AUTH_TOKEN_KEY); } catch {} }
+
+async function apiFetch(path, options = {}) {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    try {
+        const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        const data = await res.json();
+        return { ok: res.ok, data, status: res.status };
+    } catch {
+        return { ok: false, data: null, status: 0 };
+    }
+}
+
+async function initAuth() {
+    clearToken();
+}
+
+function hideOverlayStartGame() {
+    document.getElementById('startOverlay').classList.add('hidden');
+    document.getElementById('gameUI').classList.remove('hidden');
+    if (currentUser && !currentUser.is_guest) startEngine();
+    updateAdminDashboardButton();
+}
+
+function updateAdminDashboardButton() {
+    const btn = document.getElementById('openAdminDashboardButton');
+    if (currentUser && currentUser.is_admin) {
+        btn.classList.remove('hidden');
+    } else {
+        btn.classList.add('hidden');
+    }
+}
+
+async function startAsGuest() {
+    const result = await apiFetch('/api/auth/guest', { method: 'POST' });
+    if (result.ok && result.data) {
+        setToken(result.data.token);
+        currentUser = result.data.user;
+        applyServerProgress(result.data.progress);
+        hideOverlayStartGame();
+    } else {
+        showStartError('Failed to create guest session. Is the server running?');
+    }
+}
+
+async function startLogin() {
+    const username = document.getElementById('startUsername').value.trim();
+    const password = document.getElementById('startPassword').value.trim();
+    if (!username || !password) { showStartError('Fill in both fields.'); return; }
+    const result = await apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+    if (result.ok) {
+        setToken(result.data.token);
+        currentUser = result.data.user;
+        applyServerProgress(result.data.progress);
+        hideOverlayStartGame();
+    } else {
+        showStartError(result.data?.error || 'Login failed.');
+    }
+}
+
+async function startRegister() {
+    const username = document.getElementById('startUsername').value.trim();
+    const password = document.getElementById('startPassword').value.trim();
+    if (!username || !password) { showStartError('Fill in both fields.'); return; }
+    if (username.length < 3) { showStartError('Username must be at least 3 characters.'); return; }
+    if (password.length < 4) { showStartError('Password must be at least 4 characters.'); return; }
+    const guestResult = await apiFetch('/api/auth/guest', { method: 'POST' });
+    if (!guestResult.ok) { showStartError('Failed to create session.'); return; }
+    setToken(guestResult.data.token);
+    currentUser = guestResult.data.user;
+    const result = await apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify({ username, password }) });
+    if (result.ok) {
+        setToken(result.data.token);
+        currentUser = result.data.user;
+        applyServerProgress(result.data.progress);
+        hideOverlayStartGame();
+    } else {
+        clearToken();
+        currentUser = null;
+        showStartError(result.data?.error || 'Registration failed.');
+    }
+}
+
+function showStartError(msg) {
+    const el = document.getElementById('startError');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+}
+
+function applyServerProgress(progress) {
+    if (!progress) return;
+    if (progress.spawn_count > 0) {
+        spawnCount = Math.max(spawnCount, progress.spawn_count);
+        try { localStorage.setItem(SPAWN_COUNT_KEY, spawnCount); } catch {}
+        clickCounter.textContent = "Spawns: " + spawnCount;
+    }
+    if (progress.unlocked_tanks) {
+        try {
+            const serverUnlocks = JSON.parse(progress.unlocked_tanks);
+            if (Array.isArray(serverUnlocks) && serverUnlocks.length > 0) {
+                for (const key of serverUnlocks) unlocked.add(key);
+                saveUnlockedTanks();
+                updateUnlockCounter();
+            }
+        } catch {}
+    }
+}
+
+async function syncProgress() {
+    if (!currentUser || !getToken()) return;
+    const unlockedArr = [...unlocked].filter(k => {
+        const parts = k.split(':');
+        return parts.length === 3 && parseInt(parts[1]) > 1;
+    });
+    const payload = {
+        spawn_count: spawnCount,
+        unlocked_tanks: JSON.stringify(unlockedArr),
+        total_merges: 0,
+        total_kills: 0,
+        highest_tier: 1,
+        total_play_time: 0,
+        session_count: 1,
+        admin_mode: adminMode ? 1 : 0
+    };
+    await apiFetch('/api/progress', { method: 'PUT', body: JSON.stringify(payload) });
+}
+
+async function logEvent(eventType, details) {
+    if (!currentUser || !getToken()) return;
+    try {
+        await apiFetch('/api/events', { method: 'POST', body: JSON.stringify({ event_type: eventType, details: JSON.stringify(details) }) });
+    } catch {}
+}
+
+setTimeout(initAuth, 100);
+
 const UNLOCKS_STORAGE_KEY = "tank-merge:unlocked-tanks";
 const TANKS_STORAGE_KEY = "tank-merge:tanks";
 let unlocked = loadUnlockedTanks();
@@ -133,6 +278,7 @@ function saveUnlockedTanks() {
     } catch {
         // The game remains playable if browser storage is unavailable.
     }
+    syncProgress();
 }
 
 const TANK_SAVE_PROPS = ["nation", "tier", "x", "y", "angle", "adminSpawned", "vehicleClass"];
@@ -869,6 +1015,7 @@ canvas.addEventListener("click", (event) => {
     spawnCount++;
     clickCounter.textContent = "Spawns: " + spawnCount;
     try { localStorage.setItem(SPAWN_COUNT_KEY, spawnCount); } catch {}
+    syncProgress();
     const options = getSpawnableVehicles();
     const choice = options[Math.floor(Math.random() * options.length)];
     tanks.push(new Tank(choice.nation, 1, event.clientX, event.clientY, false, undefined, choice.vehicleClass));
@@ -950,6 +1097,19 @@ confirmAdminButton.addEventListener("click", () => {
         adminError.classList.remove("hidden");
     }
 });
+
+openAdminDashboardButton.addEventListener("click", () => {
+    window.open('/admin.html', '_blank');
+    closeAllDialogs();
+});
+
+document.getElementById('guestButton').addEventListener('click', startAsGuest);
+document.getElementById('startLoginBtn').addEventListener('click', startLogin);
+document.getElementById('startRegisterBtn').addEventListener('click', startRegister);
+document.getElementById('startUsername').addEventListener('keydown', e => { if (e.key === 'Enter') startLogin(); });
+document.getElementById('startPassword').addEventListener('keydown', e => { if (e.key === 'Enter') startLogin(); });
+document.getElementById('startUsername').addEventListener('input', () => document.getElementById('startError').classList.add('hidden'));
+document.getElementById('startPassword').addEventListener('input', () => document.getElementById('startError').classList.add('hidden'));
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
