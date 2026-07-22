@@ -5,6 +5,147 @@ html, body {
     font-family: Arial, sans-serif;
 }
 
+.startOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(ellipse at center, #1a2a1a 0%, #0a120a 100%);
+    padding: 20px;
+}
+
+.startBox {
+    background: rgba(12, 20, 15, 0.95);
+    border-radius: 16px;
+    padding: 40px 36px;
+    width: 340px;
+    max-width: calc(100vw - 60px);
+    text-align: center;
+    color: #f5f5f5;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+
+.startBox h1 {
+    margin: 0 0 4px;
+    font-size: 26px;
+    letter-spacing: 0.03em;
+    color: #d4e8d4;
+}
+
+.startSubtitle {
+    margin: 0 0 24px;
+    color: #8a9a8a;
+    font-size: 13px;
+}
+
+.startBtn {
+    background: rgba(100, 180, 100, 0.25);
+    color: #d4f0d4;
+    border: 1px solid rgba(100, 180, 100, 0.4);
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.startBtn:hover {
+    background: rgba(100, 180, 100, 0.35);
+}
+
+.startBtn.secondary {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.18);
+    color: #ccc;
+}
+
+.startBtn.secondary:hover {
+    background: rgba(255,255,255,0.14);
+}
+
+.startDivider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: #6a7a6a;
+    font-size: 12px;
+}
+
+.startDivider::before,
+.startDivider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+}
+
+.startLabel {
+    display: block;
+    text-align: left;
+    font-size: 12px;
+    font-weight: bold;
+    color: #8a9a8a;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+
+#startUsername,
+#startPassword {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: #e8e8e8;
+    font-size: 14px;
+}
+
+#startUsername:focus,
+#startPassword:focus {
+    outline: none;
+    border-color: rgba(100, 180, 100, 0.4);
+}
+
+#startUsername::placeholder,
+#startPassword::placeholder {
+    color: #555;
+}
+
+.startError {
+    color: #e55;
+    font-size: 13px;
+    margin: 8px 0 0;
+    font-weight: bold;
+}
+
+.startError.hidden { display: none; }
+
+.startActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.startActions .startBtn {
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+.startAdminHint {
+    margin: 20px 0 0;
+    font-size: 12px;
+    color: #6a7a6a;
+}
+
+.startAdminHint strong {
+    color: #8aba8a;
+}
+
 .hidden { display: none; }
 
 canvas {
@@ -66,7 +207,8 @@ canvas {
 .dangerButton:focus-visible { background: #c44; }
 
 #muteEngineButton,
-#openAdminDialogButton {
+#openAdminDialogButton,
+#openAdminDashboardButton {
     background: rgba(255,255,255,0.12);
     color: #fff;
     border: 1px solid rgba(255,255,255,0.25);
@@ -79,7 +221,9 @@ canvas {
 #muteEngineButton:hover,
 #muteEngineButton:focus-visible,
 #openAdminDialogButton:hover,
-#openAdminDialogButton:focus-visible { background: rgba(255,255,255,0.2); }
+#openAdminDialogButton:focus-visible,
+#openAdminDashboardButton:hover,
+#openAdminDashboardButton:focus-visible { background: rgba(255,255,255,0.2); }
 
 .resumeButton,
 .dialogActions button {
