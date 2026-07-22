@@ -1,0 +1,16 @@
+app = "tank-merge"
+primary_region = "iad"
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  PORT = "8080"
+  ADMIN_USERNAME = "admin"
+  ADMIN_PASSWORD = "change-me-in-production"
+  JWT_SECRET = "generate-a-random-secret-here"
+
+[[mounts]]
+  source = "data"
+  destination = "/app/server"
+  processes = ["app"]

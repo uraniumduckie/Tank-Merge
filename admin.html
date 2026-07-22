@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tank Evolution - Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Tank Evolution — Admin Dashboard</h1>
+        <div id="adminStatus">Checking authentication...</div>
+        <button id="backToGameBtn" type="button">Back to Game</button>
+        <button id="refreshBtn" type="button">Refresh</button>
+        <button id="logoutBtn" type="button" class="hidden">Logout</button>
+    </header>
+
+    <main>
+        <section id="statsCards">
+            <div class="statCard"><div class="statValue" id="statTotalUsers">-</div><div class="statLabel">Total Users</div></div>
+            <div class="statCard"><div class="statValue" id="statGuests">-</div><div class="statLabel">Guests</div></div>
+            <div class="statCard"><div class="statValue" id="statRegistered">-</div><div class="statLabel">Registered</div></div>
+            <div class="statCard"><div class="statValue" id="statTotalSpawns">-</div><div class="statLabel">Total Spawns</div></div>
+            <div class="statCard"><div class="statValue" id="statTotalMerges">-</div><div class="statLabel">Total Merges</div></div>
+            <div class="statCard"><div class="statValue" id="statTotalKills">-</div><div class="statLabel">Total Kills</div></div>
+        </section>
+
+        <section id="usersSection">
+            <div class="sectionHeader">
+                <h2>Users</h2>
+                <input id="userSearchInput" type="text" placeholder="Search by username, country, IP..." class="searchInput">
+                <span id="userCountBadge" class="countBadge">0</span>
+            </div>
+            <div id="usersTableWrapper">
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="username">Username</th>
+                            <th data-sort="type">Type</th>
+                            <th data-sort="country">Country</th>
+                            <th data-sort="created">Created</th>
+                            <th data-sort="lastLogin">Last Login</th>
+                            <th data-sort="spawns">Spawns</th>
+                            <th data-sort="merges">Merges</th>
+                            <th data-sort="kills">Kills</th>
+                            <th data-sort="highestTier">Tier</th>
+                            <th style="min-width:100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <div id="confirmDialog" class="dialogOverlay hidden">
+            <div class="dialogBox">
+                <h3 id="confirmDialogTitle">Confirm</h3>
+                <p id="confirmDialogMessage">Are you sure?</p>
+                <div class="dialogBoxActions">
+                    <button id="confirmDialogCancel" type="button">Cancel</button>
+                    <button id="confirmDialogOk" type="button" class="dangerButton">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <section id="userDetailSection" class="hidden">
+            <div class="detailHeader">
+                <h2 id="userDetailTitle">User Details</h2>
+                <button id="backToListBtn" type="button">Back to list</button>
+            </div>
+
+            <div id="userDetailContent">
+                <div class="loading">Loading user details...</div>
+            </div>
+
+            <div id="userDetailCharts" class="hidden">
+                <div class="chartsRow">
+                    <div class="chartContainer">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                    <div class="chartContainer">
+                        <canvas id="eventPieChart"></canvas>
+                    </div>
+                </div>
+                <div id="userMapContainer" class="hidden">
+                    <h3>Location</h3>
+                    <div id="userMap"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
