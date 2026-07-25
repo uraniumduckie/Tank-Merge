@@ -1,0 +1,19 @@
+{
+  "name": "tank-merge-server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "pngjs": "^7.0.0",
+    "sql.js": "^1.11.0",
+    "uuid": "^9.0.1",
+    "ws": "^8.21.1"
+  }
+}

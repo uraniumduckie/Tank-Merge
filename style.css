@@ -1,0 +1,722 @@
+html, body {
+    margin: 0;
+    overflow: hidden;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.connectingOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+}
+
+.startOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(ellipse at center, #1a2a1a 0%, #0a120a 100%);
+    padding: 20px;
+}
+
+.startBox {
+    background: rgba(12, 20, 15, 0.95);
+    border-radius: 16px;
+    padding: 40px 36px;
+    width: 340px;
+    max-width: calc(100vw - 60px);
+    text-align: center;
+    color: #f5f5f5;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+
+.startBox h1 {
+    margin: 0 0 4px;
+    font-size: 26px;
+    letter-spacing: 0.03em;
+    color: #d4e8d4;
+}
+
+.startSubtitle {
+    margin: 0 0 24px;
+    color: #8a9a8a;
+    font-size: 13px;
+}
+
+.startBtn {
+    background: rgba(100, 180, 100, 0.25);
+    color: #d4f0d4;
+    border: 1px solid rgba(100, 180, 100, 0.4);
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.startBtn:hover {
+    background: rgba(100, 180, 100, 0.35);
+}
+
+.startBtn.secondary {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.18);
+    color: #ccc;
+}
+
+.startBtn.secondary:hover {
+    background: rgba(255,255,255,0.14);
+}
+
+.startDivider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: #6a7a6a;
+    font-size: 12px;
+}
+
+.startDivider::before,
+.startDivider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+}
+
+.startLabel {
+    display: block;
+    text-align: left;
+    font-size: 12px;
+    font-weight: bold;
+    color: #8a9a8a;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+
+#startUsername,
+#startPassword {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: #e8e8e8;
+    font-size: 14px;
+}
+
+#startUsername:focus,
+#startPassword:focus {
+    outline: none;
+    border-color: rgba(100, 180, 100, 0.4);
+}
+
+#startUsername::placeholder,
+#startPassword::placeholder {
+    color: #555;
+}
+
+.startError {
+    color: #e55;
+    font-size: 13px;
+    margin: 8px 0 0;
+    font-weight: bold;
+}
+
+.startError.hidden { display: none; }
+
+.startActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.startActions .startBtn {
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+.startAdminHint {
+    margin: 20px 0 0;
+    font-size: 12px;
+    color: #6a7a6a;
+}
+
+.startAdminHint strong {
+    color: #8aba8a;
+}
+
+.hidden { display: none; }
+
+.loadingSpinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    border: 4px solid rgba(255,255,255,0.15);
+    border-top-color: #8aba8a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loadingText {
+    margin: 0;
+    color: #8a9a8a;
+    font-size: 14px;
+}
+
+canvas {
+    display: block;
+}
+
+.dialogBackdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.dialogBackdrop.hidden {
+    display: grid;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.actionDialog,
+.clearFieldDialog {
+    background: rgba(12, 20, 15, 0.94);
+    border-radius: 12px;
+    padding: 36px 32px 32px;
+    width: 300px;
+    max-width: calc(100vw - 60px);
+    text-align: center;
+    color: #f5f5f5;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    transform: scale(1);
+    transition: transform 0.25s ease;
+}
+
+.dialogBackdrop.hidden .actionDialog,
+.dialogBackdrop.hidden .clearFieldDialog {
+    transform: scale(0.92);
+}
+
+.clearFieldDialog p { margin: 16px 0; color: #ccc; }
+
+.actionDialog h2,
+.clearFieldDialog h2 {
+    margin: 0;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #f5f5f5;
+}
+
+.pauseActions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.dangerButton {
+    background: #a33;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+.dangerButton:hover,
+.dangerButton:focus-visible { background: #c44; }
+
+.toggleGroup {
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    padding: 0 4px;
+}
+
+.toggleRow span { font-size: 14px; color: #ccc; }
+
+.toggleSwitch {
+    appearance: none;
+    width: 40px;
+    height: 22px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.toggleSwitch::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.toggleSwitch:checked {
+    background: #4caf50;
+}
+
+.toggleSwitch:checked::before {
+    transform: translateX(18px);
+}
+
+#openAdminDialogButton,
+#openAdminDashboardButton,
+#logoutButton {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: inherit;
+}
+
+#openAdminDialogButton:hover,
+#openAdminDialogButton:focus-visible,
+#openAdminDashboardButton:hover,
+#openAdminDashboardButton:focus-visible,
+#logoutButton:hover,
+#logoutButton:focus-visible { background: rgba(255,255,255,0.2); }
+
+.resumeButton,
+.dialogActions button {
+    background: rgba(255,255,255,0.1);
+    color: #f5f5f5;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    padding: 11px 22px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.resumeButton:hover,
+.dialogActions button:hover,
+.resumeButton:focus-visible,
+.dialogActions button:focus-visible { background: rgba(255,255,255,0.18); }
+
+.dialogActions { display: flex; gap: 8px; justify-content: center; }
+
+.passwordLabel {
+    display: block;
+    margin-top: 16px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #ccc;
+}
+
+#adminPassword {
+    margin-top: 4px;
+    margin-bottom: 12px;
+    min-width: 160px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    padding: 6px 8px;
+    color: #f5f5f5;
+}
+
+.adminError {
+    color: #e55;
+    font-weight: bold;
+}
+
+#clickCounter,
+#unlockCounter {
+    position: fixed;
+    right: 12px;
+    z-index: 20;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #f5f5f5;
+    background: rgba(12, 20, 15, 0.94);
+    border-radius: 999px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#clickCounter { top: 12px; }
+#unlockCounter { top: 48px; }
+
+#unlockToggleButton,
+#pauseButton {
+    position: fixed;
+    top: 12px;
+    z-index: 20;
+    border: none;
+    border-radius: 999px;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    font-size: 22px;
+    cursor: pointer;
+    color: #fff;
+    background: #10190f;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#unlockToggleButton { left: 12px; }
+#pauseButton { left: 72px; }
+
+.nationDropdown {
+    position: fixed;
+    top: 72px;
+    left: 12px;
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    width: 48px;
+    box-sizing: border-box;
+    background: rgba(12, 20, 15, 0.94);
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-8px);
+    transition: max-height 0.28s ease, opacity 0.22s ease, transform 0.28s ease, padding 0.28s ease;
+}
+
+.nationDropdown.open {
+    max-height: 220px;
+    opacity: 1;
+    transform: translateY(0);
+    padding: 10px;
+}
+
+.nationDropdown.hidden { display: none; }
+
+.nationIconButton {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.35);
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.nationIconButton:hover,
+.nationIconButton:focus-visible {
+    border-color: rgba(255,255,255,0.7);
+}
+
+.secretIconButton {
+    background: #222;
+}
+
+#fieldButton {
+    position: fixed;
+    bottom: 12px;
+    left: 32px;
+    z-index: 20;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    line-height: 0;
+    transition: transform 0.2s ease;
+}
+
+#fieldButton:hover,
+#fieldButton:focus-visible {
+    transform: scale(1.15);
+}
+
+#fieldBackButton {
+    position: fixed;
+    bottom: 12px;
+    left: 32px;
+    z-index: 20;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 48px;
+    color: #fff;
+    line-height: 1;
+    transition: transform 0.2s ease;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+#fieldBackButton:hover,
+#fieldBackButton:focus-visible {
+    transform: scale(1.15);
+}
+
+.fieldMenu {
+    position: fixed;
+    bottom: 64px;
+    left: 265px;
+    z-index: 25;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    box-sizing: border-box;
+    background: rgba(12, 20, 15, 0.94);
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateX(-8px);
+    transition: max-width 0.28s ease, opacity 0.22s ease, transform 0.28s ease, padding 0.28s ease;
+}
+
+.fieldMenu.open {
+    max-width: 220px;
+    opacity: 1;
+    transform: translateX(0);
+    padding: 10px;
+}
+
+.fieldMenu.hidden { display: none; }
+
+.fieldMenuButton {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.35);
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+    padding: 0;
+}
+
+.fieldMenuButton:hover,
+.fieldMenuButton:focus-visible {
+    border-color: rgba(255,255,255,0.7);
+}
+
+.techTreePanel {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 26;
+    width: min(900px, calc(100vw - 24px));
+    background: rgba(12, 20, 15, 0.97);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    padding: 16px 18px 20px;
+    color: #f5f5f5;
+    border-radius: 12px;
+    box-sizing: border-box;
+    transform: translateY(-12px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.28s ease, opacity 0.22s ease;
+    transform-origin: top left;
+}
+
+.techTreePanel.open {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.techTreePanel.hidden { display: none; }
+
+.techTreeHeader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.techTreeHeader .closeTechTreeButton:last-child { margin-left: auto; }
+
+.techTreeTitle {
+    font-size: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 14px;
+    border-radius: 999px;
+    color: #fff;
+}
+
+.closeTechTreeButton {
+    background: rgba(255,255,255,0.1);
+    color: #f5f5f5;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.closeTechTreeButton:hover,
+.closeTechTreeButton:focus-visible { background: rgba(255,255,255,0.2); }
+
+.techTreeBody {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.techTreeRowLabel {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+.techTreeRowLabel.hidden { display: none; }
+
+.techTreeRow {
+    display: flex;
+    gap: 6px;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+
+.techTreeRow.hidden { display: none; }
+
+.unlockSlot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.06);
+    min-height: 72px;
+    min-width: 78px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.unlockSlot img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    display: block;
+    transform: rotate(90deg);
+}
+
+.unlockSlot button {
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transform: rotate(90deg);
+}
+
+.unlockSlot .lockIcon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.unlockSlot.adminClickable {
+    outline: none;
+    box-shadow: inset 0 0 0 2px rgba(133, 223, 133, 0.7);
+    cursor: pointer;
+}
+
+.unlockSlot.adminClickable:hover {
+    background: rgba(111, 202, 104, 0.15);
+}
+
+.unlockSlot div {
+    font-size: 10px;
+    text-align: center;
+    color: #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+#battleChat {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    width: 200px;
+    border-radius: 8px;
+    background: rgba(12, 20, 15, 0.85);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+#chatInput {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    padding: 6px 10px;
+    background: transparent;
+    color: #f5f5f5;
+    font-size: 12px;
+    outline: none;
+}
+
+#chatInput::placeholder {
+    color: #555;
+}

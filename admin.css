@@ -1,0 +1,610 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f1412;
+    color: #e8e8e8;
+    min-height: 100vh;
+}
+
+header {
+    background: #1a241f;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #2a3a32;
+    flex-wrap: wrap;
+}
+
+header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+}
+
+#adminStatus {
+    font-size: 13px;
+    color: #999;
+    flex: 1;
+}
+
+header button {
+    background: rgba(255,255,255,0.08);
+    color: #e8e8e8;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+header button:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+#backToGameBtn {
+    background: rgba(100, 180, 255, 0.15);
+    border-color: rgba(100, 180, 255, 0.3);
+}
+
+#logoutBtn {
+    background: rgba(255, 100, 100, 0.15);
+    border-color: rgba(255, 100, 100, 0.3);
+}
+
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+#statsCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.statCard {
+    background: #1a241f;
+    border: 1px solid #2a3a32;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+
+.statValue {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hidden { display: none; }
+
+.error-message {
+    color: #e55;
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+#usersSection h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: #ccc;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.searchInput {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #e8e8e8;
+    font-size: 13px;
+    flex: 1;
+    min-width: 180px;
+    max-width: 320px;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: rgba(100, 180, 255, 0.4);
+}
+
+.searchInput::placeholder {
+    color: #666;
+}
+
+.countBadge {
+    background: rgba(100, 180, 255, 0.15);
+    color: #64b4ff;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#usersTableWrapper {
+    overflow-x: auto;
+}
+
+#usersTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+#usersTable th {
+    background: #1a241f;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #aaa;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #2a3a32;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+
+#usersTable th:hover {
+    color: #fff;
+    background: #223028;
+}
+
+#usersTable td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1e2a24;
+    white-space: nowrap;
+}
+
+#usersTable tbody tr:hover {
+    background: #1a241f;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.badge-guest {
+    background: rgba(255, 200, 50, 0.15);
+    color: #f5c842;
+}
+
+.badge-registered {
+    background: rgba(80, 200, 120, 0.15);
+    color: #50c878;
+}
+
+.badge-admin {
+    background: rgba(100, 180, 255, 0.15);
+    color: #64b4ff;
+}
+
+.viewUserBtn {
+    background: rgba(100, 180, 255, 0.1);
+    color: #64b4ff;
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.viewUserBtn:hover {
+    background: rgba(100, 180, 255, 0.2);
+}
+
+.detailHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.detailHeader h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #eee;
+}
+
+#backToListBtn {
+    background: rgba(255,255,255,0.08);
+    color: #e8e8e8;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#backToListBtn:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+#userDetailContent {
+    background: #1a241f;
+    border: 1px solid #2a3a32;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.detailGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.detailItem {
+    padding: 14px;
+    background: #0f1412;
+    border-radius: 6px;
+}
+
+.detailLabel {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.detailValue {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.4;
+}
+
+.detailValue .badge {
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.progressBarContainer {
+    margin: 16px 0;
+    padding: 14px;
+    background: #0f1412;
+    border-radius: 6px;
+}
+
+.progressBar {
+    position: relative;
+    height: 28px;
+    background: #1e2a24;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    border-radius: 14px;
+    transition: width 0.3s ease;
+    min-width: 0;
+}
+
+.progressText {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.eventsSection {
+    margin-top: 16px;
+}
+
+.eventsSection h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: #ccc;
+}
+
+.eventsTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.eventsTable th {
+    background: #0f1412;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+    color: #999;
+    font-size: 11px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #2a3a32;
+}
+
+.eventsTable td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #1e2a24;
+}
+
+.chartsRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.chartContainer {
+    background: #1a241f;
+    border: 1px solid #2a3a32;
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chartContainer canvas {
+    max-height: 320px;
+}
+
+.chartPlaceholder {
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+#userMapContainer {
+    margin: 16px 0;
+}
+
+#userMapContainer h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: #ccc;
+}
+
+#userMap {
+    height: 280px;
+    border-radius: 8px;
+    border: 1px solid #2a3a32;
+    overflow: hidden;
+}
+
+#userMap .leaflet-control-attribution {
+    font-size: 10px;
+}
+
+.actionBtn {
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 11px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: #ccc;
+    margin: 0 2px;
+}
+
+.actionBtn:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+.actionBtn.danger {
+    color: #e55;
+    border-color: rgba(255,80,80,0.25);
+    background: rgba(255,80,80,0.08);
+}
+
+.actionBtn.danger:hover {
+    background: rgba(255,80,80,0.18);
+}
+
+.actionBtn.warn {
+    color: #f5c842;
+    border-color: rgba(255,200,50,0.25);
+    background: rgba(255,200,50,0.08);
+}
+
+.actionBtn.warn:hover {
+    background: rgba(255,200,50,0.18);
+}
+
+.dialogOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+}
+
+.dialogOverlay.hidden { display: none; }
+
+.dialogBox {
+    background: #1a241f;
+    border: 1px solid #2a3a32;
+    border-radius: 12px;
+    padding: 28px;
+    width: 360px;
+    max-width: calc(100vw - 60px);
+    color: #e8e8e8;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.dialogBox h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: #f5f5f5;
+}
+
+.dialogBox p {
+    margin: 0 0 20px;
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.dialogBoxActions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.dialogBoxActions button {
+    border-radius: 6px;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08);
+    color: #e8e8e8;
+}
+
+.dialogBoxActions button:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.dialogBoxActions .dangerButton {
+    background: rgba(255,80,80,0.15);
+    border-color: rgba(255,80,80,0.3);
+    color: #e55;
+}
+
+.dialogBoxActions .dangerButton:hover {
+    background: rgba(255,80,80,0.25);
+}
+
+.dialogBoxActions .primaryButton {
+    background: rgba(80, 200, 120, 0.15);
+    border-color: rgba(80, 200, 120, 0.3);
+    color: #50c878;
+}
+
+.dialogBoxActions .primaryButton:hover {
+    background: rgba(80, 200, 120, 0.25);
+}
+
+.dialogBoxWide {
+    width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.editGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.editFieldRow {
+    margin-bottom: 12px;
+}
+
+.editLabel {
+    display: block;
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.editInput {
+    width: 100%;
+    background: #0f1412;
+    border: 1px solid #2a3a32;
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #e8e8e8;
+    font-size: 13px;
+}
+
+.editInput:focus {
+    outline: none;
+    border-color: rgba(100, 180, 255, 0.4);
+}
+
+.editCheckbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #4caf50;
+    cursor: pointer;
+}
+
+.editTextarea {
+    width: 100%;
+    background: #0f1412;
+    border: 1px solid #2a3a32;
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #e8e8e8;
+    font-size: 12px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    resize: vertical;
+}
+
+.editTextarea:focus {
+    outline: none;
+    border-color: rgba(100, 180, 255, 0.4);
+}
+
+.editError {
+    color: #e55;
+    font-size: 13px;
+    padding: 8px 0;
+}
+
+@media (max-width: 768px) {
+    .chartsRow {
+        grid-template-columns: 1fr;
+    }
+    .detailGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

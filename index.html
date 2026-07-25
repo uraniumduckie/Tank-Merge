@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tank Evolution</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="loadingOverlay" class="startOverlay">
+        <div class="startBox">
+            <div id="loadingSpinner" class="loadingSpinner"></div>
+            <p class="loadingText">Loading...</p>
+        </div>
+    </div>
+    <div id="connectingOverlay" class="connectingOverlay hidden">
+        <div class="startBox">
+            <div class="loadingSpinner"></div>
+            <p class="loadingText">Connecting to server...</p>
+        </div>
+    </div>
+
+    <div id="startOverlay" class="startOverlay hidden">
+        <div class="startBox">
+            <h1>Tank Evolution</h1>
+            <p class="startSubtitle">Merge tanks and dominate the field!</p>
+            <button id="guestButton" class="startBtn" type="button">Play as Guest</button>
+            <div class="startDivider"><span>or</span></div>
+            <label class="startLabel" for="startUsername">Username</label>
+            <input id="startUsername" type="text" autocomplete="username" placeholder="Enter username">
+            <label class="startLabel" for="startPassword">Password</label>
+            <input id="startPassword" type="password" autocomplete="current-password" placeholder="Enter password">
+            <p id="startError" class="startError hidden"></p>
+            <div class="startActions">
+                <button id="startLoginBtn" class="startBtn" type="button">Login</button>
+                <button id="startRegisterBtn" class="startBtn secondary" type="button">Register</button>
+            </div>
+            <p class="startAdminHint">Admin? You'll have access to everything!</p>
+        </div>
+    </div>
+
+    <div id="gameUI" class="hidden">
+        <button id="unlockToggleButton" type="button" aria-label="Unlocked tanks" title="Unlocked tanks">☰</button>
+        <button id="pauseButton" type="button" aria-label="Pause game" title="Pause game">⏸</button>
+
+        <div id="clickCounter">Spawns: 0</div>
+        <div id="unlockCounter">0/60</div>
+
+        <div id="battleChat" class="hidden">
+            <input id="chatInput" type="text" placeholder="Press T to chat" maxlength="120">
+        </div>
+
+        <button id="fieldButton" type="button" aria-label="Switch field" title="Switch field"><img src="assets/box.png" alt="" style="width:225px;height:180px;pointer-events:none;"></button>
+        <button id="fieldBackButton" type="button" aria-label="Back to main field" title="Back to main field" class="hidden">←</button>
+
+        <div id="fieldMenu" class="fieldMenu hidden" role="menu" aria-label="Choose a field"></div>
+
+        <div id="nationDropdown" class="nationDropdown hidden" role="menu" aria-label="Choose a nation"></div>
+
+        <div id="techTreePanel" class="techTreePanel hidden" role="dialog" aria-labelledby="techTreeTitle">
+            <div class="techTreeHeader">
+                <button id="backTechTreeButton" class="closeTechTreeButton" type="button" aria-label="Back to nations">←</button>
+                <div id="techTreeTitle" class="techTreeTitle">USA</div>
+                <button id="closeTechTreeButton" class="closeTechTreeButton" type="button" aria-label="Close tech tree">✕</button>
+            </div>
+            <div class="techTreeBody">
+                <div id="techTreeTanksLabel" class="techTreeRowLabel">Tanks</div>
+                <div id="techTreeTanksRow" class="techTreeRow"></div>
+                <div id="techTreeDestroyersLabel" class="techTreeRowLabel">Tank Destroyers</div>
+                <div id="techTreeDestroyersRow" class="techTreeRow"></div>
+            </div>
+        </div>
+
+        <div id="pauseDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="actionDialog" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+                <h2 id="pauseTitle">Game paused</h2>
+                <div class="pauseActions">
+                    <button id="openExplodeDialogButton" class="dangerButton" type="button">Explode all tanks</button>
+                    <button id="openResetDialogButton" class="dangerButton" type="button">Reset progress</button>
+                    <button id="openAdminDialogButton" type="button">Enable admin mode</button>
+                    <button id="openAdminDashboardButton" type="button" class="hidden">Admin Dashboard</button>
+                    <button id="logoutButton" type="button">Log out</button>
+                </div>
+                <div class="toggleGroup">
+                    <label class="toggleRow"><span>Mute engines</span><input id="muteEngineToggle" type="checkbox" class="toggleSwitch"></label>
+                    <label class="toggleRow"><span>Hide tags</span><input id="hideTagsToggle" type="checkbox" class="toggleSwitch"></label>
+                    <label class="toggleRow"><span>Debug hitboxes</span><input id="debugToggle" type="checkbox" class="toggleSwitch"></label>
+                </div>
+                <button id="resumeButton" class="resumeButton" type="button">Resume game</button>
+            </section>
+        </div>
+
+        <div id="explodeDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="clearFieldDialog" role="dialog" aria-modal="true" aria-labelledby="explodeTitle" aria-describedby="explodeMessage">
+                <h2 id="explodeTitle">Explode all tanks?</h2>
+                <p id="explodeMessage">This will delete every tank currently on the field. This cannot be undone.</p>
+                <div class="dialogActions"><button class="cancelDialogButton" type="button">Cancel</button><button id="confirmExplodeButton" class="dangerButton" type="button">Explode all</button></div>
+            </section>
+        </div>
+
+        <div id="resetDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="clearFieldDialog" role="dialog" aria-modal="true" aria-labelledby="resetTitle" aria-describedby="resetMessage">
+                <h2 id="resetTitle">Reset all progress?</h2>
+                <p id="resetMessage">This will lock every earned tank and cannot be undone.</p>
+                <div class="dialogActions"><button class="cancelDialogButton" type="button">Cancel</button><button id="confirmResetButton" class="dangerButton" type="button">Reset progress</button></div>
+            </section>
+        </div>
+
+        <div id="adminDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="clearFieldDialog" role="dialog" aria-modal="true" aria-labelledby="adminTitle" aria-describedby="adminMessage">
+                <h2 id="adminTitle">Enable admin mode</h2>
+                <p id="adminMessage">Enter the password to unlock and spawn any tank from the tank list.</p>
+                <label class="passwordLabel" for="adminPassword">Password</label>
+                <input id="adminPassword" type="password" inputmode="numeric" autocomplete="off">
+                <p id="adminError" class="adminError hidden">Incorrect password.</p>
+                <div class="dialogActions"><button class="cancelDialogButton" type="button">Cancel</button><button id="confirmAdminButton" type="button">Enable</button></div>
+            </section>
+        </div>
+
+        <div id="destroyedDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="clearFieldDialog" role="dialog" aria-modal="true" aria-labelledby="destroyedTitle" aria-describedby="destroyedMessage">
+                <h2 id="destroyedTitle">Tank Destroyed!</h2>
+                <p id="destroyedMessage">Your tank was destroyed in battle and has been returned to your field.</p>
+                <div class="dialogActions"><button id="confirmDestroyedButton" type="button">Return to field</button></div>
+            </section>
+        </div>
+
+        <div id="battleConfirmDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="clearFieldDialog" role="dialog" aria-modal="true" aria-labelledby="battleConfirmTitle" aria-describedby="battleConfirmMessage">
+                <h2 id="battleConfirmTitle">TO BATTLE!</h2>
+                <p id="battleConfirmMessage">Are you sure about that?</p>
+                <div class="dialogActions"><button class="cancelDialogButton" type="button">Cancel</button><button id="confirmBattleButton" class="dangerButton" type="button">Send to battle</button></div>
+            </section>
+        </div>
+
+        <div id="beatGameDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="clearFieldDialog" role="dialog" aria-modal="true" aria-labelledby="beatGameTitle" aria-describedby="beatGameMessage">
+                <h2 id="beatGameTitle">You beat the game!</h2>
+                <p id="beatGameMessage">Was it worth it?</p>
+                <div class="dialogActions"><button id="confirmBeatGameButton" type="button">nah🥀</button></div>
+            </section>
+        </div>
+    </div>
+
+    <canvas id="battlefield"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
