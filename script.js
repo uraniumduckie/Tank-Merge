@@ -194,7 +194,7 @@ const nationSizeScale = { ussr: 1.3, usa: 1.15 };
 const pivotShifts = {
     "ussr:tank:3": 0.08, "ussr:tank:4": 0.08, "ussr:tank:6": 0.08, "ussr:tank:7": 0.08, "ussr:tank:8": 0.08, "ussr:tank:9": 0.08, "ussr:tank:10": 0.08,
     "ussr:td:4": 0.10, "ussr:td:5": 0.10, "ussr:td:6": 0.10, "ussr:td:8": 0.10, "ussr:td:9": 0.10, "ussr:td:10": 0.10,
-    "germany:tank:6": 0.10, "germany:tank:7": 0.08, "germany:tank:8": 0.08, "germany:tank:9": 0.08, "germany:tank:10": 0.08,
+    "germany:tank:6": 0.12, "germany:tank:7": 0.08, "germany:tank:8": 0.08, "germany:tank:9": 0.08, "germany:tank:10": 0.08,
     "germany:td:2": 0.10, "germany:td:3": 0.10, "germany:td:6": 0.10, "germany:td:7": 0.10, "germany:td:8": 0.10, "germany:td:9": 0.10, "germany:td:10": 0.10,
     "usa:tank:5": 0.10, "usa:tank:6": 0.17, "usa:tank:7": 0.14, "usa:tank:8": 0.14, "usa:tank:9": 0.08, "usa:tank:10": 0.08,
     "usa:td:7": 0.16, "usa:td:8": 0.12, "usa:td:9": 0.13, "usa:td:10": 0.14
