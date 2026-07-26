@@ -3156,4 +3156,5 @@ window.addEventListener("beforeunload", () => {
         ws.onclose = null;
         ws.close();
     }
-});
+})
+};
