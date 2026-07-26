@@ -39,3 +39,17 @@ CREATE TABLE IF NOT EXISTS game_events (
 CREATE INDEX IF NOT EXISTS idx_events_user ON game_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_events_type ON game_events(event_type);
 CREATE INDEX IF NOT EXISTS idx_events_created ON game_events(created_at);
+
+CREATE TABLE IF NOT EXISTS maps (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  base_image TEXT NOT NULL DEFAULT 'map_base.png',
+  layout_image TEXT NOT NULL DEFAULT 'map_layout.png',
+  spawns TEXT NOT NULL DEFAULT '{"germany":{"x":104.5,"y":204.5},"ussr":{"x":571.5,"y":829.5},"usa":{"x":1055.5,"y":338.5}}',
+  world_scale REAL NOT NULL DEFAULT 2.5,
+  active INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_maps_active ON maps(active);

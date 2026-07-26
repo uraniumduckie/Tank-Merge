@@ -521,14 +521,11 @@ const ussrField = new Image();
 ussrField.src = "assets/ussrfield.png";
 const usaField = new Image();
 usaField.src = "assets/usafield.png";
-const battleFieldImg = new Image();
-battleFieldImg.src = "assets/map_base.png";
-const battleLayoutImg = new Image();
-battleLayoutImg.src = "assets/map_layout.png";
+let activeMapConfig = null;
 let battleObstacleMap = null;
 let battleMapWidth = 0;
 let battleMapHeight = 0;
-const BATTLE_WORLD_SCALE = 2.5;
+let BATTLE_WORLD_SCALE = 2.5;
 let battleWorldWidth = 0;
 let battleWorldHeight = 0;
 let camX = 0;
@@ -538,11 +535,30 @@ let playerReloadRemaining = 0;
 let battleTracks = [];
 let debugObstacleCanvas = null;
 let debugObstacleReady = false;
-battleFieldImg.onload = () => {
-    battleWorldWidth = Math.round(battleFieldImg.naturalWidth * BATTLE_WORLD_SCALE);
-    battleWorldHeight = Math.round(battleFieldImg.naturalHeight * BATTLE_WORLD_SCALE);
-};
-battleLayoutImg.onload = () => {
+let battleFieldImg = new Image();
+let battleLayoutImg = new Image();
+
+async function loadActiveMap() {
+    try {
+        const res = await fetch('/api/map/active');
+        if (res.ok) {
+            activeMapConfig = await res.json();
+            BATTLE_WORLD_SCALE = activeMapConfig.world_scale || 2.5;
+            battleFieldImg = new Image();
+            battleLayoutImg = new Image();
+            battleFieldImg.src = "assets/" + activeMapConfig.base_image;
+            battleLayoutImg.src = "assets/" + activeMapConfig.layout_image;
+        }
+    } catch {}
+    if (!activeMapConfig) {
+        battleFieldImg.src = "assets/map_base.png";
+        battleLayoutImg.src = "assets/map_layout.png";
+    }
+    battleFieldImg.onload = () => {
+        battleWorldWidth = Math.round(battleFieldImg.naturalWidth * BATTLE_WORLD_SCALE);
+        battleWorldHeight = Math.round(battleFieldImg.naturalHeight * BATTLE_WORLD_SCALE);
+    };
+    battleLayoutImg.onload = () => {
     const offscreen = document.createElement("canvas");
     offscreen.width = battleLayoutImg.naturalWidth;
     offscreen.height = battleLayoutImg.naturalHeight;
@@ -585,7 +601,10 @@ battleLayoutImg.onload = () => {
             }
         }
     }
-};
+    };
+}
+
+loadActiveMap();
 
 const tankFiles = {
     usa: ["m3stuart", "m5stuart", "m4sherman", "m4a3e8sherman", "m26pershing", "m46patton", "m47patton", "m60patton", "m1abrams", "m1a2abrams"],
@@ -3043,7 +3062,7 @@ function sendToBattle(tank) {
     fieldTanks.battle.push(tank);
     
     // 4. Spawn in the correct colored circle based on nation
-    const SPAWN_PIXELS = {
+    const SPAWN_PIXELS = (activeMapConfig && activeMapConfig.spawns) ? activeMapConfig.spawns : {
         germany: { x: 104.5, y: 204.5 },
         ussr: { x: 571.5, y: 829.5 },
         usa: { x: 1055.5, y: 338.5 }

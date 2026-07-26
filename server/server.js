@@ -359,6 +359,138 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const battleServer = new BattleServer();
 
+// --- Map management ---
+
+function getActiveMap() {
+  const db = getDb();
+  let active = db.prepare('SELECT * FROM maps WHERE active = 1').get();
+  if (!active) {
+    db.prepare(`INSERT INTO maps (id, name, base_image, layout_image, spawns, world_scale, active)
+      VALUES (?, ?, ?, ?, ?, ?, 1) ON CONFLICT(id) DO NOTHING`).run(
+      'default', 'Default Map', 'map_base.png', 'map_layout.png',
+      JSON.stringify({ germany: { x: 104.5, y: 204.5 }, ussr: { x: 571.5, y: 829.5 }, usa: { x: 1055.5, y: 338.5 } }),
+      2.5
+    );
+    active = db.prepare('SELECT * FROM maps WHERE active = 1').get();
+  }
+  return active;
+}
+
+app.get('/api/map/active', (req, res) => {
+  try {
+    const map = getActiveMap();
+    res.json({
+      id: map.id,
+      name: map.name,
+      base_image: map.base_image,
+      layout_image: map.layout_image,
+      spawns: JSON.parse(map.spawns || '{}'),
+      world_scale: map.world_scale,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch active map' });
+  }
+});
+
+app.get('/api/admin/maps', authMiddleware, adminMiddleware, (req, res) => {
+  try {
+    const maps = getDb().prepare('SELECT * FROM maps ORDER BY created_at DESC').all();
+    res.json({ maps });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch maps' });
+  }
+});
+
+app.post('/api/admin/maps', authMiddleware, adminMiddleware, (req, res) => {
+  try {
+    const { name, base_image, layout_image, spawns, world_scale } = req.body;
+    if (!name) return res.status(400).json({ error: 'Map name is required' });
+    const id = require('crypto').randomUUID();
+    getDb().prepare(`INSERT INTO maps (id, name, base_image, layout_image, spawns, world_scale)
+      VALUES (?, ?, ?, ?, ?, ?)`).run(
+      id, name, base_image || 'map_base.png', layout_image || 'map_layout.png',
+      JSON.stringify(spawns || { germany: { x: 104.5, y: 204.5 }, ussr: { x: 571.5, y: 829.5 }, usa: { x: 1055.5, y: 338.5 } }),
+      world_scale ?? 2.5
+    );
+    const map = getDb().prepare('SELECT * FROM maps WHERE id = ?').get(id);
+    res.json({ map });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create map' });
+  }
+});
+
+app.put('/api/admin/maps/:id', authMiddleware, adminMiddleware, (req, res) => {
+  try {
+    const db = getDb();
+    const existing = db.prepare('SELECT * FROM maps WHERE id = ?').get(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Map not found' });
+    const { name, base_image, layout_image, spawns, world_scale } = req.body;
+    db.prepare(`UPDATE maps SET
+      name = COALESCE(?, name),
+      base_image = COALESCE(?, base_image),
+      layout_image = COALESCE(?, layout_image),
+      spawns = COALESCE(?, spawns),
+      world_scale = COALESCE(?, world_scale),
+      updated_at = datetime('now')
+      WHERE id = ?`).run(
+      name ?? null, base_image ?? null, layout_image ?? null,
+      spawns ? JSON.stringify(spawns) : null,
+      world_scale ?? null,
+      req.params.id
+    );
+    // Reload battle server if this is the active map
+    const map = db.prepare('SELECT * FROM maps WHERE id = ?').get(req.params.id);
+    if (map.active) {
+      reloadBattleMap(map);
+    }
+    res.json({ map });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update map' });
+  }
+});
+
+app.delete('/api/admin/maps/:id', authMiddleware, adminMiddleware, (req, res) => {
+  try {
+    const map = getDb().prepare('SELECT * FROM maps WHERE id = ?').get(req.params.id);
+    if (!map) return res.status(404).json({ error: 'Map not found' });
+    if (map.active) return res.status(400).json({ error: 'Cannot delete the active map. Activate another map first.' });
+    getDb().prepare('DELETE FROM maps WHERE id = ?').run(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete map' });
+  }
+});
+
+app.post('/api/admin/maps/:id/activate', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const db = getDb();
+    const map = db.prepare('SELECT * FROM maps WHERE id = ?').get(req.params.id);
+    if (!map) return res.status(404).json({ error: 'Map not found' });
+    db.prepare('UPDATE maps SET active = 0 WHERE active = 1').run();
+    db.prepare('UPDATE maps SET active = 1, updated_at = datetime(\'now\') WHERE id = ?').run(req.params.id);
+    await reloadBattleMap(map);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to activate map' });
+  }
+});
+
+async function reloadBattleMap(map) {
+  battleServer.stop();
+  battleServer.setConfig({
+    layoutFile: map.layout_image,
+    spawns: JSON.parse(map.spawns || '{}'),
+    worldScale: map.world_scale,
+  });
+  try {
+    await battleServer.loadMap();
+    console.log('Battle map reloaded:', map.name);
+  } catch (err) {
+    console.error('Failed to reload battle map:', err);
+  }
+  battleServer.start();
+}
+
 wss.on('connection', (ws, req) => {
   let userId = null;
   let userData = null;
@@ -454,11 +586,26 @@ wss.on('connection', (ws, req) => {
 
 initDb().then(async () => {
   seedAdmin();
-  try {
-    await battleServer.loadMap();
-    console.log('Battle map loaded');
-  } catch (err) {
-    console.error('Failed to load battle map:', err);
+  const activeMap = getActiveMap();
+  if (activeMap) {
+    battleServer.setConfig({
+      layoutFile: activeMap.layout_image,
+      spawns: JSON.parse(activeMap.spawns || '{}'),
+      worldScale: activeMap.world_scale,
+    });
+    try {
+      await battleServer.loadMap();
+      console.log('Battle map loaded:', activeMap.name);
+    } catch (err) {
+      console.error('Failed to load battle map:', err);
+    }
+  } else {
+    try {
+      await battleServer.loadMap();
+      console.log('Battle map loaded');
+    } catch (err) {
+      console.error('Failed to load battle map:', err);
+    }
   }
   battleServer.start();
   console.log('Battle server started');

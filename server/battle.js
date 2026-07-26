@@ -16,6 +16,7 @@ class BattleServer {
         this.BATTLE_WORLD_SCALE = 2.5;
         this.battleWorldWidth = Math.round(1195 * this.BATTLE_WORLD_SCALE);
         this.battleWorldHeight = Math.round(896 * this.BATTLE_WORLD_SCALE);
+        this.layoutFile = 'map_layout.png';
         this.battleSpawns = {
             germany: { x: 104.5, y: 204.5 },
             ussr: { x: 571.5, y: 829.5 },
@@ -23,8 +24,14 @@ class BattleServer {
         };
     }
 
+    setConfig(config) {
+        if (config.layoutFile) this.layoutFile = config.layoutFile;
+        if (config.spawns) this.battleSpawns = config.spawns;
+        if (config.worldScale) this.BATTLE_WORLD_SCALE = config.worldScale;
+    }
+
     async loadMap() {
-        const filePath = path.resolve(__dirname, '..', 'assets', 'map_layout.png');
+        const filePath = path.resolve(__dirname, '..', 'assets', this.layoutFile);
         const data = fs.readFileSync(filePath);
         return new Promise((resolve, reject) => {
             const png = new PngJS({ filterType: 4 });

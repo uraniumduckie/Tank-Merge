@@ -394,3 +394,151 @@ async function refreshDashboard() {
     allUsers = users;
     applyFilter();
 }
+
+// --- Map Management ---
+
+let editingMapId = null;
+
+async function loadMaps() {
+    const result = await apiFetch('/api/admin/maps');
+    if (!result.ok || !result.data) return;
+    renderMaps(result.data.maps);
+}
+
+async function loadImageAssets() {
+    const result = await apiFetch('/api/admin/tank-assets');
+    if (!result.ok || !result.data) return [];
+    return result.data.assets;
+}
+
+function renderMaps(maps) {
+    const container = document.getElementById('mapsList');
+    if (!maps.length) {
+        container.innerHTML = '<div style="padding:20px;text-align:center;color:#5a6a5a;">No maps configured yet.</div>';
+        return;
+    }
+    let html = '<div style="display:grid;gap:8px;">';
+    for (const map of maps) {
+        const spawns = (() => { try { return JSON.parse(map.spawns || '{}'); } catch { return {}; } })();
+        const spawnStr = Object.entries(spawns).map(([n, p]) => `${n}(${p.x},${p.y})`).join(', ');
+        html += `<div class="override-item" style="font-size:12px;padding:10px 12px;">
+            <div style="flex:1;">
+                <span class="key" style="font-size:13px;">${escHtml(map.name)}</span>
+                ${map.active ? '<span style="color:#40c060;font-size:11px;margin-left:8px;">● ACTIVE</span>' : ''}
+                <div class="vals" style="margin-top:2px;">${escHtml(map.base_image)} / ${escHtml(map.layout_image)} | scale: ${map.world_scale} | spawns: ${escHtml(spawnStr)}</div>
+            </div>
+            <div style="display:flex;gap:4px;">
+                ${!map.active ? `<button class="activate-btn" data-id="${map.id}" style="background:#1a4a2a;color:#ddd;border:1px solid #3a7a55;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;">Activate</button>` : ''}
+                <button class="edit-map-btn" data-id="${map.id}" style="background:#2a3a30;color:#ddd;border:1px solid #4a6a55;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;">Edit</button>
+                ${!map.active ? `<button class="del-map-btn" data-id="${map.id}" style="background:#4a2020;color:#ddd;border:1px solid #7a4040;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;">Delete</button>` : ''}
+            </div>
+        </div>`;
+    }
+    html += '</div>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.activate-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Activate this map? Players will use the new map on next load.')) return;
+            await apiFetch(`/api/admin/maps/${btn.dataset.id}/activate`, { method: 'POST' });
+            loadMaps();
+        });
+    });
+    container.querySelectorAll('.edit-map-btn').forEach(btn => {
+        btn.addEventListener('click', () => openMapDialog(btn.dataset.id));
+    });
+    container.querySelectorAll('.del-map-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Delete this map?')) return;
+            await apiFetch(`/api/admin/maps/${btn.dataset.id}`, { method: 'DELETE' });
+            loadMaps();
+        });
+    });
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function openMapDialog(mapId) {
+    editingMapId = mapId;
+    const assets = await loadImageAssets();
+    const baseSel = document.getElementById('mapBaseImage');
+    const layoutSel = document.getElementById('mapLayoutImage');
+    baseSel.innerHTML = assets.map(f => `<option value="${f}">${f}</option>`).join('');
+    layoutSel.innerHTML = assets.map(f => `<option value="${f}">${f}</option>`).join('');
+
+    document.getElementById('mapDialogTitle').textContent = mapId ? 'Edit Map' : 'New Map';
+    document.getElementById('mapDialogError').classList.add('hidden');
+
+    if (mapId) {
+        const result = await apiFetch('/api/admin/maps');
+        if (result.ok && result.data) {
+            const map = result.data.maps.find(m => m.id === mapId);
+            if (map) {
+                document.getElementById('mapName').value = map.name;
+                document.getElementById('mapBaseImage').value = map.base_image;
+                document.getElementById('mapLayoutImage').value = map.layout_image;
+                document.getElementById('mapWorldScale').value = map.world_scale;
+                const spawns = (() => { try { return JSON.parse(map.spawns || '{}'); } catch { return {}; } })();
+                document.querySelectorAll('.spawn-input').forEach(inp => {
+                    const n = inp.dataset.nation;
+                    const axis = inp.dataset.axis;
+                    if (spawns[n]) inp.value = spawns[n][axis] ?? '';
+                });
+            }
+        }
+    } else {
+        document.getElementById('mapName').value = '';
+        document.getElementById('mapBaseImage').value = 'map_base.png';
+        document.getElementById('mapLayoutImage').value = 'map_layout.png';
+        document.getElementById('mapWorldScale').value = '2.5';
+        document.querySelectorAll('.spawn-input').forEach(inp => {
+            const defs = { usa: { x: 1055.5, y: 338.5 }, germany: { x: 104.5, y: 204.5 }, ussr: { x: 571.5, y: 829.5 } };
+            const n = inp.dataset.nation;
+            const axis = inp.dataset.axis;
+            if (defs[n]) inp.value = defs[n][axis];
+        });
+    }
+    document.getElementById('mapDialog').classList.remove('hidden');
+}
+
+document.getElementById('newMapBtn').addEventListener('click', () => openMapDialog(null));
+document.getElementById('mapDialogCancel').addEventListener('click', () => {
+    document.getElementById('mapDialog').classList.add('hidden');
+    editingMapId = null;
+});
+document.getElementById('mapDialogSave').addEventListener('click', async () => {
+    const name = document.getElementById('mapName').value.trim();
+    if (!name) { document.getElementById('mapDialogError').textContent = 'Map name is required.'; document.getElementById('mapDialogError').classList.remove('hidden'); return; }
+    const spawns = {};
+    document.querySelectorAll('.spawn-input').forEach(inp => {
+        const n = inp.dataset.nation;
+        const axis = inp.dataset.axis;
+        if (!spawns[n]) spawns[n] = {};
+        spawns[n][axis] = parseFloat(inp.value) || 0;
+    });
+    const body = {
+        name,
+        base_image: document.getElementById('mapBaseImage').value,
+        layout_image: document.getElementById('mapLayoutImage').value,
+        world_scale: parseFloat(document.getElementById('mapWorldScale').value) || 2.5,
+        spawns,
+    };
+    let result;
+    if (editingMapId) {
+        result = await apiFetch(`/api/admin/maps/${editingMapId}`, { method: 'PUT', body: JSON.stringify(body) });
+    } else {
+        result = await apiFetch('/api/admin/maps', { method: 'POST', body: JSON.stringify(body) });
+    }
+    if (result.ok) {
+        document.getElementById('mapDialog').classList.add('hidden');
+        editingMapId = null;
+        loadMaps();
+    } else {
+        document.getElementById('mapDialogError').textContent = result.data?.error || 'Failed to save map.';
+        document.getElementById('mapDialogError').classList.remove('hidden');
+    }
+});
+
+loadMaps();
