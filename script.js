@@ -658,12 +658,70 @@ function computeTankHitbox(key) {
     }
     if (maxX < minX || maxY < minY) { minX = 0; minY = 0; maxX = c.width; maxY = c.height; }
     tankHitboxData[key] = { x: minX / c.width, y: minY / c.height, w: (maxX - minX + 1) / c.width, h: (maxY - minY + 1) / c.height };
-    if (key === "usa:td:10") {
+    if (key === "usa:tank:10"
+        || key === "usa:tank:9"
+        || key === "ussr:tank:5"
+        || key === "germany:tank:4"
+        || key === "ussr:td:7"
+     ) {
+        const hb = tankHitboxData[key];
+        hb.y += hb.h * 0.2;
+        hb.h *= 0.8;
+    }
+    if (key === "usa:td:7"
+    ) {
+        const hb = tankHitboxData[key];
+        hb.y += hb.h * 0.5;
+        hb.h *= 0.5;
+    }
+    if (key === "germany:td:10"
+        || key === "germany:td:9"
+        || key === "germany:td:7"
+        || key === "germany:td:5"
+        || key === "germany:td:4"
+        || key === "ussr:td:9"
+        || key === "usa:td:4"
+    ) {
+        const hb = tankHitboxData[key];
+        hb.y += hb.h * 0.25;
+        hb.h *= 0.75;
+    }
+    if (key === "usa:td:10"
+        || key === "ussr:tank:9"
+        || key === "ussr:tank:6"
+        || key === "ussr:td:8"
+        || key === "ussr:td:5"
+        || key === "usa:tank:5"
+        || key === "usa:tank:6"
+        || key === "usa:tank:7"
+        || key === "usa:tank:8"
+    ) {
         const hb = tankHitboxData[key];
         hb.y += hb.h * 0.4;
         hb.h *= 0.6;
     }
-    if (key === "germany:tank:9" || key === "germany:tank:10") {
+    if (key === "germany:tank:10" 
+        || key === "germany:tank:9"
+        || key === "germany:tank:8"
+        || key === "germany:tank:7"
+        || key === "germany:tank:6"
+        || key === "germany:tank:5"
+        || key === "germany:td:8"
+        || key === "germany:td:6"
+        || key === "germany:td:2"
+        || key === "germany:td:3"
+        || key === "usa:tank:4"
+        || key === "usa:td:9"
+        || key === "usa:td:8"
+        || key === "usa:td:6"
+        || key === "usa:td:5"
+        || key === "ussr:tank:8"
+        || key === "ussr:tank:7"
+        || key === "ussr:tank:4"
+        || key === "ussr:td:10"
+        || key === "ussr:td:6"
+        || key === "ussr:tank:3"
+    ) {
         const hb = tankHitboxData[key];
         hb.y += hb.h * 0.3;
         hb.h *= 0.7;
@@ -1192,11 +1250,11 @@ class Tank {
                 if (!this._overlapsAt(newX, oldY)) {
                     this.x = newX;
                     this.y = oldY;
-                    this.speed *= 0.2;
+                    this.speed *= 0.4;
                 } else if (!this._overlapsAt(oldX, newY)) {
                     this.x = oldX;
                     this.y = newY;
-                    this.speed *= 0.2;
+                    this.speed *= 0.4;
                 } else {
                     this.x = oldX;
                     this.y = oldY;
