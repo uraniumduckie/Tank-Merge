@@ -665,7 +665,7 @@ function computeTankHitbox(key) {
      ) {
         const hb = tankHitboxData[key];
         hb.y += hb.h * 0.2;
-        hb.h *= 0.8;
+        hb.h *= 0.5;
     }
     if (key === "usa:td:7"
     ) {
