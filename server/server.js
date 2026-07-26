@@ -311,6 +311,50 @@ app.post('/api/admin/users/:id/reset', authMiddleware, adminMiddleware, (req, re
   }
 });
 
+// --- Hitbox override storage ---
+const HITBOX_OVERRIDES_PATH = path.join(__dirname, 'hitbox-overrides.json');
+
+function loadHitboxOverrides() {
+  try {
+    if (require('fs').existsSync(HITBOX_OVERRIDES_PATH)) {
+      return JSON.parse(require('fs').readFileSync(HITBOX_OVERRIDES_PATH, 'utf8'));
+    }
+  } catch (e) { console.error('Failed to load hitbox overrides:', e); }
+  return {};
+}
+
+function saveHitboxOverrides(data) {
+  require('fs').writeFileSync(HITBOX_OVERRIDES_PATH, JSON.stringify(data, null, 2), 'utf8');
+}
+
+app.get('/api/admin/hitbox-overrides', authMiddleware, adminMiddleware, (req, res) => {
+  res.json(loadHitboxOverrides());
+});
+
+app.put('/api/admin/hitbox-overrides', authMiddleware, adminMiddleware, (req, res) => {
+  try {
+    const data = req.body;
+    if (typeof data !== 'object' || data === null) return res.status(400).json({ error: 'Invalid data' });
+    for (const key of Object.keys(data)) {
+      const hb = data[key];
+      if (!hb || typeof hb.x !== 'number' || typeof hb.y !== 'number' || typeof hb.w !== 'number' || typeof hb.h !== 'number') {
+        return res.status(400).json({ error: `Invalid hitbox for "${key}". Each override needs { x, y, w, h } as numbers.` });
+      }
+    }
+    saveHitboxOverrides(data);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save hitbox overrides' });
+  }
+});
+
+app.get('/api/admin/tank-assets', authMiddleware, adminMiddleware, (req, res) => {
+  const fs = require('fs');
+  const assetsDir = path.join(ROOT, 'assets');
+  const files = fs.readdirSync(assetsDir).filter(f => f.endsWith('.png') && !f.startsWith('map_') && !f.endsWith('flag.png') && f !== 'field.png' && f !== 'box.png');
+  res.json({ assets: files });
+});
+
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const battleServer = new BattleServer();

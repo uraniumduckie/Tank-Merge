@@ -657,38 +657,67 @@ function computeTankHitbox(key) {
     }
     if (maxX < minX || maxY < minY) { minX = 0; minY = 0; maxX = c.width; maxY = c.height; }
     tankHitboxData[key] = { x: minX / c.width, y: minY / c.height, w: (maxX - minX + 1) / c.width, h: (maxY - minY + 1) / c.height };
-    if (key === "usa:td:10") {
-        const hb = tankHitboxData[key];
-        hb.y += hb.h * 0.4;
-        hb.h *= 0.6;
-    }
-    if (key === "germany:tank:10" 
-        || key === "germany:td:10"
-        || key === "germany:tank:9"
-        || key === "germany:tank:8"
-        || key === "germany:tank:7"
-        || key === "germany:tank:6"
-        || key === "germany:tank:5"
-        || key === "germany:td:8"
-        || key === "germany:td:6"
-        || key === "germany:td:2"
-        || key === "germany:td:3"
-        || key === "usa:tank:4"
-        || key === "usa:td:9"
-        || key === "usa:td:8"
-        || key === "usa:td:6"
-        || key === "usa:td:5"
-        || key === "ussr:tank:8"
-        || key === "ussr:tank:7"
-        || key === "ussr:tank:4"
-        || key === "ussr:td:10"
-        || key === "ussr:td:6"
-        || key === "ussr:tank:3"
-    ) {
-        const hb = tankHitboxData[key];
-        hb.y += hb.h * 0.3;
-        hb.h *= 0.7;
-    }
+    const __o = tankHitboxData[key];
+    if (key === "usa:tank:3") { if (__o) { __o.x = 0.02; __o.y = 0.041; __o.w = 0.9601; __o.h = 0.9552; } }
+    if (key === "usa:tank:4") { if (__o) { __o.x = 0.0075; __o.y = 0.2824; __o.w = 0.985; __o.h = 0.7162; } }
+    if (key === "usa:tank:5") { if (__o) { __o.x = 0.0217; __o.y = 0.4227; __o.w = 0.9565; __o.h = 0.5773; } }
+    if (key === "usa:tank:6") { if (__o) { __o.x = 0.0149; __o.y = 0.4362; __o.w = 0.9723; __o.h = 0.5638; } }
+    if (key === "usa:tank:7") { if (__o) { __o.x = 0.0165; __o.y = 0.3733; __o.w = 0.9725; __o.h = 0.6134; } }
+    if (key === "usa:tank:8") { if (__o) { __o.x = 0.0114; __o.y = 0.41; __o.w = 0.9817; __o.h = 0.5878; } }
+    if (key === "usa:tank:9") { if (__o) { __o.x = 0; __o.y = 0.1956; __o.w = 0.9841; __o.h = 0.8044; } }
+    if (key === "usa:tank:10") { if (__o) { __o.x = 0.0108; __o.y = 0.1939; __o.w = 0.9784; __o.h = 0.8009; } }
+    if (key === "usa:tank:1") { if (__o) { __o.x = 0.0143; __o.y = 0.0721; __o.w = 0.9667; __o.h = 0.9088; } }
+    if (key === "usa:tank:2") { if (__o) { __o.x = 0.0093; __o.y = 0.0256; __o.w = 0.9767; __o.h = 0.8608; } }
+    if (key === "ussr:tank:2") { if (__o) { __o.x = 0.0097; __o.y = 0.1266; __o.w = 0.9831; __o.h = 0.8683; } }
+    if (key === "ussr:tank:1") { if (__o) { __o.x = 0.0515; __o.y = 0.0871; __o.w = 0.9269; __o.h = 0.9028; } }
+    if (key === "ussr:tank:3") { if (__o) { __o.x = 0.0018; __o.y = 0.3023; __o.w = 0.9911; __o.h = 0.6745; } }
+    if (key === "ussr:tank:4") { if (__o) { __o.x = 0.0121; __o.y = 0.3732; __o.w = 0.9779; __o.h = 0.6249; } }
+    if (key === "ussr:tank:5") { if (__o) { __o.x = 0.0175; __o.y = 0.2095; __o.w = 0.9668; __o.h = 0.7853; } }
+    if (key === "ussr:tank:6") { if (__o) { __o.x = 0.033; __o.y = 0.3626; __o.w = 0.9216; __o.h = 0.6334; } }
+    if (key === "ussr:tank:7") { if (__o) { __o.x = 0.0181; __o.y = 0.2787; __o.w = 0.9718; __o.h = 0.6746; } }
+    if (key === "ussr:tank:8") { if (__o) { __o.x = 0.0103; __o.y = 0.3252; __o.w = 0.9795; __o.h = 0.6733; } }
+    if (key === "ussr:tank:9") { if (__o) { __o.x = 0.0165; __o.y = 0.4057; __o.w = 0.9773; __o.h = 0.5809; } }
+    if (key === "ussr:tank:10") { if (__o) { __o.x = 0.0059; __o.y = 0.2629; __o.w = 0.9882; __o.h = 0.6869; } }
+    if (key === "germany:tank:1") { if (__o) { __o.x = 0.019; __o.y = 0.0101; __o.w = 0.9667; __o.h = 0.9441; } }
+    if (key === "germany:tank:2") { if (__o) { __o.x = 0.0144; __o.y = 0.0209; __o.w = 0.9732; __o.h = 0.9253; } }
+    if (key === "germany:tank:3") { if (__o) { __o.x = 0.0141; __o.y = 0.0517; __o.w = 0.9737; __o.h = 0.899; } }
+    if (key === "germany:tank:4") { if (__o) { __o.x = 0.0207; __o.y = 0.1919; __o.w = 0.9731; __o.h = 0.7649; } }
+    if (key === "germany:tank:5") { if (__o) { __o.x = 0.0129; __o.y = 0.2747; __o.w = 0.9724; __o.h = 0.6961; } }
+    if (key === "germany:tank:6") { if (__o) { __o.x = 0.0127; __o.y = 0.3037; __o.w = 0.9819; __o.h = 0.6647; } }
+    if (key === "germany:tank:7") { if (__o) { __o.x = 0.0123; __o.y = 0.3371; __o.w = 0.9772; __o.h = 0.6273; } }
+    if (key === "germany:tank:8") { if (__o) { __o.x = 0.012; __o.y = 0.317; __o.w = 0.9739; __o.h = 0.6684; } }
+    if (key === "germany:tank:9") { if (__o) { __o.x = 0.0138; __o.y = 0.3091; __o.w = 0.9665; __o.h = 0.6777; } }
+    if (key === "germany:tank:10") { if (__o) { __o.x = 0.024; __o.y = 0.306; __o.w = 0.9429; __o.h = 0.6907; } }
+    if (key === "usa:td:1") { if (__o) { __o.x = 0.0172; __o.y = 0.073; __o.w = 0.9754; __o.h = 0.8308; } }
+    if (key === "usa:td:2") { if (__o) { __o.x = 0.0273; __o.y = 0.0172; __o.w = 0.961; __o.h = 0.8585; } }
+    if (key === "usa:td:3") { if (__o) { __o.x = 0.0463; __o.y = 0.051; __o.w = 0.9091; __o.h = 0.9415; } }
+    if (key === "usa:td:4") { if (__o) { __o.x = 0.0183; __o.y = 0.1993; __o.w = 0.9733; __o.h = 0.7045; } }
+    if (key === "usa:td:5") { if (__o) { __o.x = 0.0215; __o.y = 0.2724; __o.w = 0.9669; __o.h = 0.7138; } }
+    if (key === "usa:td:6") { if (__o) { __o.x = 0.0564; __o.y = 0.3033; __o.w = 0.8953; __o.h = 0.6888; } }
+    if (key === "usa:td:7") { if (__o) { __o.x = 0.0448; __o.y = 0.4607; __o.w = 0.9243; __o.h = 0.52; } }
+    if (key === "usa:td:8") { if (__o) { __o.x = 0.0254; __o.y = 0.3123; __o.w = 0.9357; __o.h = 0.6683; } }
+    if (key === "usa:td:9") { if (__o) { __o.x = 0.0112; __o.y = 0.3592; __o.w = 0.9809; __o.h = 0.6389; } }
+    if (key === "usa:td:10") { if (__o) { __o.x = 0.021; __o.y = 0.4011; __o.w = 0.9752; __o.h = 0.5896; } }
+    if (key === "ussr:td:1") { if (__o) { __o.x = 0.0304; __o.y = 0.0245; __o.w = 0.9418; __o.h = 0.9566; } }
+    if (key === "ussr:td:2") { if (__o) { __o.x = 0.0304; __o.y = 0.092; __o.w = 0.9418; __o.h = 0.6866; } }
+    if (key === "ussr:td:3") { if (__o) { __o.x = 0.0204; __o.y = 0.0199; __o.w = 0.9323; __o.h = 0.9718; } }
+    if (key === "ussr:td:4") { if (__o) { __o.x = 0.0199; __o.y = 0.1663; __o.w = 0.9589; __o.h = 0.8003; } }
+    if (key === "ussr:td:5") { if (__o) { __o.x = 0.0506; __o.y = 0.4195; __o.w = 0.9211; __o.h = 0.5673; } }
+    if (key === "ussr:td:6") { if (__o) { __o.x = 0.0185; __o.y = 0.3045; __o.w = 0.9538; __o.h = 0.673; } }
+    if (key === "ussr:td:7") { if (__o) { __o.x = 0.027; __o.y = 0.2011; __o.w = 0.9595; __o.h = 0.7589; } }
+    if (key === "ussr:td:8") { if (__o) { __o.x = 0.0276; __o.y = 0.3588; __o.w = 0.9467; __o.h = 0.5994; } }
+    if (key === "ussr:td:9") { if (__o) { __o.x = 0.0539; __o.y = 0.2964; __o.w = 0.8976; __o.h = 0.7011; } }
+    if (key === "ussr:td:10") { if (__o) { __o.x = 0.074; __o.y = 0.3255; __o.w = 0.9049; __o.h = 0.6562; } }
+    if (key === "germany:td:1") { if (__o) { __o.x = 0.0168; __o.y = 0.0728; __o.w = 0.9637; __o.h = 0.9077; } }
+    if (key === "germany:td:2") { if (__o) { __o.x = 0.0276; __o.y = 0.3268; __o.w = 0.9559; __o.h = 0.6608; } }
+    if (key === "germany:td:3") { if (__o) { __o.x = 0.0325; __o.y = 0.3051; __o.w = 0.9233; __o.h = 0.6843; } }
+    if (key === "germany:td:4") { if (__o) { __o.x = 0.0389; __o.y = 0.2561; __o.w = 0.946; __o.h = 0.7175; } }
+    if (key === "germany:td:5") { if (__o) { __o.x = 0.0259; __o.y = 0.2492; __o.w = 0.9656; __o.h = 0.6659; } }
+    if (key === "germany:td:6") { if (__o) { __o.x = 0.0188; __o.y = 0.3363; __o.w = 0.9454; __o.h = 0.6584; } }
+    if (key === "germany:td:7") { if (__o) { __o.x = 0.0125; __o.y = 0.276; __o.w = 0.9703; __o.h = 0.6962; } }
+    if (key === "germany:td:8") { if (__o) { __o.x = 0.0099; __o.y = 0.3103; __o.w = 0.9901; __o.h = 0.6494; } }
+    if (key === "germany:td:9") { if (__o) { __o.x = 0.0187; __o.y = 0.2857; __o.w = 0.9676; __o.h = 0.6751; } }
+    if (key === "germany:td:10") { if (__o) { __o.x = 0.0204; __o.y = 0.3037; __o.w = 0.9611; __o.h = 0.6831; } }
 }
 
 function getTankImage(nation, tier, vehicleClass = "tank") {
@@ -2724,6 +2753,32 @@ animate();
 // connectBattleWebSocket(); // Connect to battle server
 setInterval(() => { if (currentUser && getToken()) syncProgress(); }, 30000);
 
+let hitboxOverrides = null;
+async function loadHitboxOverrides() {
+    try {
+        const token = getToken();
+        if (!token) return;
+        const res = await fetch('/api/admin/hitbox-overrides', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) return;
+        hitboxOverrides = await res.json();
+        if (adminMode) applyHitboxOverrides();
+    } catch {}
+}
+function applyHitboxOverrides() {
+    if (!hitboxOverrides) return;
+    for (const [key, hb] of Object.entries(hitboxOverrides)) {
+        if (tankHitboxData[key]) {
+            tankHitboxData[key].x = hb.x;
+            tankHitboxData[key].y = hb.y;
+            tankHitboxData[key].w = hb.w;
+            tankHitboxData[key].h = hb.h;
+        } else {
+            tankHitboxData[key] = { x: hb.x, y: hb.y, w: hb.w, h: hb.h };
+        }
+    }
+}
+loadHitboxOverrides();
+
 const loadingOverlay = document.getElementById('loadingOverlay');
 const startOverlay = document.getElementById('startOverlay');
 if (getToken()) {
@@ -3100,6 +3155,7 @@ confirmAdminButton.addEventListener("click", () => {
     if (pw === "VladLox") {
         adminMode = true; saveAdminMode(); adminError.classList.add("hidden");
         updateAdminButton(); renderNationDropdown(); if (currentTechTreeNation) renderTechTree(currentTechTreeNation); closeAllDialogs();
+        applyHitboxOverrides();
     } else {
         adminError.classList.remove("hidden");
     }
