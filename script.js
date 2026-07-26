@@ -133,9 +133,8 @@ function getEnemyHitbox(nation, tier, vehicleClass) {
     const hb = tankHitboxData[key];
     const dw = computeDisplayWidth(nation, tier, vehicleClass);
     const dh = computeDisplayHeight(nation, tier, vehicleClass);
-    const ps = getEnemyPivotShift(nation, tier, vehicleClass);
-    if (!hb) return { w: dw * 0.7, h: dh * 0.7, ox: 0, oy: -ps };
-    return { w: dw * hb.w, h: dh * hb.h, ox: (hb.x + hb.w / 2 - 0.5) * dw, oy: (hb.y + hb.h / 2 - 0.5) * dh - ps };
+    if (!hb) return { w: dw * 0.7, h: dh * 0.7, ox: 0, oy: 0 };
+    return { w: dw * hb.w, h: dh * hb.h, ox: 0, oy: 0 };
 }
 function getEnemyCollisionRadius(nation, tier, vehicleClass) {
     const hb = getEnemyHitbox(nation, tier, vehicleClass);
@@ -1182,9 +1181,8 @@ class Tank {
         const dw = this.getDisplayWidth();
         const frame = getFrameRect(this.nation, this.tier, this.vehicleClass);
         const dh = dw * frame.sh / frame.sw;
-        const ps = this.getPivotShift();
-        if (!hb) return { w: dw * 0.7, h: dh * 0.7, ox: 0, oy: -ps };
-        return { w: dw * hb.w, h: dh * hb.h, ox: (hb.x + hb.w / 2 - 0.5) * dw, oy: (hb.y + hb.h / 2 - 0.5) * dh - ps };
+        if (!hb) return { w: dw * 0.7, h: dh * 0.7, ox: 0, oy: 0 };
+        return { w: dw * hb.w, h: dh * hb.h, ox: 0, oy: 0 };
     }
     getHitboxCorners() { return getCorners(this.x, this.y, this.angle + Math.PI / 2, this.getHitbox()); }
     containsPoint(px, py) {
