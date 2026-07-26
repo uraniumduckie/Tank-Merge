@@ -1320,11 +1320,9 @@ class Tank {
                 if (!this._overlapsAt(newX, oldY)) {
                     this.x = newX;
                     this.y = oldY;
-                    this.speed *= 0.4;
                 } else if (!this._overlapsAt(oldX, newY)) {
                     this.x = oldX;
                     this.y = newY;
-                    this.speed *= 0.4;
                 } else {
                     this.x = oldX;
                     this.y = oldY;
