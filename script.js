@@ -657,43 +657,7 @@ function computeTankHitbox(key) {
     }
     if (maxX < minX || maxY < minY) { minX = 0; minY = 0; maxX = c.width; maxY = c.height; }
     tankHitboxData[key] = { x: minX / c.width, y: minY / c.height, w: (maxX - minX + 1) / c.width, h: (maxY - minY + 1) / c.height };
-    if (key === "usa:tank:10"
-        || key === "usa:tank:9"
-        || key === "ussr:tank:5"
-        || key === "germany:tank:4"
-        || key === "ussr:td:7"
-     ) {
-        const hb = tankHitboxData[key];
-        hb.y += hb.h * 0.2;
-        hb.h *= 0.8;
-    }
-    if (key === "usa:td:7"
-    ) {
-        const hb = tankHitboxData[key];
-        hb.y += hb.h * 0.5;
-        hb.h *= 0.5;
-    }
-    if (key === "germany:td:9"
-        || key === "germany:td:7"
-        || key === "germany:td:5"
-        || key === "germany:td:4"
-        || key === "ussr:td:9"
-        || key === "usa:td:4"
-    ) {
-        const hb = tankHitboxData[key];
-        hb.y += hb.h * 0.25;
-        hb.h *= 0.75;
-    }
-    if (key === "usa:td:10"
-        || key === "ussr:tank:9"
-        || key === "ussr:tank:6"
-        || key === "ussr:td:8"
-        || key === "ussr:td:5"
-        || key === "usa:tank:5"
-        || key === "usa:tank:6"
-        || key === "usa:tank:7"
-        || key === "usa:tank:8"
-    ) {
+    
         const hb = tankHitboxData[key];
         hb.y += hb.h * 0.4;
         hb.h *= 0.6;
@@ -725,7 +689,6 @@ function computeTankHitbox(key) {
         hb.y += hb.h * 0.3;
         hb.h *= 0.7;
     }
-}
 
 function getTankImage(nation, tier, vehicleClass = "tank") {
     const key = `${nation}:${vehicleClass}:${tier}`;
