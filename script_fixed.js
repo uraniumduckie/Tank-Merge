@@ -689,7 +689,6 @@ function computeTankHitbox(key) {
         hb.y += hb.h * 0.3;
         hb.h *= 0.7;
     }
-}
 
 function getTankImage(nation, tier, vehicleClass = "tank") {
     const key = `${nation}:${vehicleClass}:${tier}`;
@@ -3158,3 +3157,4 @@ window.addEventListener("beforeunload", () => {
         ws.close();
     }
 });
+}
