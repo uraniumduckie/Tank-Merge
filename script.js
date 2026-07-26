@@ -1943,7 +1943,7 @@ document.addEventListener('keydown', (e) => {
     }
     if (key === ' ' && currentField === 'battle' && playerBattleTank && playerReloadRemaining <= 0) {
         e.preventDefault();
-        playSound("assets/collide.wav");
+        playSound("assets/shoot.wav");
         const dw2 = playerBattleTank.getDisplayWidth();
         const frame = getFrameRect(playerBattleTank.nation, playerBattleTank.tier, playerBattleTank.vehicleClass);
         const dh2 = dw2 * frame.sh / frame.sw;
@@ -2062,7 +2062,7 @@ function connectBattleWebSocket() {
                 case 'bullet_spawn':
                     bulletTrail.bullets.push(msg.bullet);
                     if (msg.bullet.ownerId !== currentUser.id) {
-                        playSound("assets/collide.wav");
+                        playSound("assets/shoot.wav");
                     }
                     break;
                 case 'chat':
