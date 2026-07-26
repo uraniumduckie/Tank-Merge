@@ -194,7 +194,7 @@ const nationSizeScale = { ussr: 1.3, usa: 1.15 };
 const pivotShifts = {
     "ussr:tank:3": 0.08, "ussr:tank:4": 0.08, "ussr:tank:6": 0.08, "ussr:tank:7": 0.08, "ussr:tank:8": 0.08, "ussr:tank:9": 0.08, "ussr:tank:10": 0.08,
     "ussr:td:4": 0.10, "ussr:td:5": 0.10, "ussr:td:6": 0.10, "ussr:td:8": 0.10, "ussr:td:9": 0.10, "ussr:td:10": 0.10,
-    "germany:tank:7": 0.08, "germany:tank:8": 0.08, "germany:tank:9": 0.08, "germany:tank:10": 0.08,
+    "germany:tank:6": 0.10, "germany:tank:7": 0.08, "germany:tank:8": 0.08, "germany:tank:9": 0.08, "germany:tank:10": 0.08,
     "germany:td:2": 0.10, "germany:td:3": 0.10, "germany:td:6": 0.10, "germany:td:7": 0.10, "germany:td:8": 0.10, "germany:td:9": 0.10, "germany:td:10": 0.10,
     "usa:tank:5": 0.10, "usa:tank:6": 0.17, "usa:tank:7": 0.14, "usa:tank:8": 0.14, "usa:tank:9": 0.08, "usa:tank:10": 0.08,
     "usa:td:7": 0.16, "usa:td:8": 0.12, "usa:td:9": 0.13, "usa:td:10": 0.14
@@ -1273,12 +1273,8 @@ class Tank {
         ctx.roundRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight, 5);
         ctx.fill();
         ctx.fillStyle = "#f6f6f6";
-        if (currentField === "battle") {
-            ctx.fillText(name, 0, 0);
-        } else {
-            ctx.fillText(name, 0, tier ? -7 : 0);
-            if (tier) ctx.fillText(tier, 0, 7);
-        }
+        ctx.fillText(name, 0, tier ? -7 : 0);
+        if (tier) ctx.fillText(tier, 0, 7);
         ctx.restore();
     }
     draw() {
@@ -2220,7 +2216,7 @@ function handlePlayerHit(msg) {
         if (!window.damageNumbers) window.damageNumbers = [];
         window.damageNumbers.push({ x, y: y - 30, text: '-' + dmg, life: 1, vy: -1.5 });
     };
-    if (msg.targetId === currentUser.id && battleConnectionReady && battleFirstStateReceived) {
+    if (msg.targetId === currentUser.id) {
         const shooter = enemyPlayers.find(p => p.id === msg.shooterId);
         if (playerBattleTank && shooter && shooter.nation === playerBattleTank.nation) return;
         if (playerBattleTank) {
@@ -2267,11 +2263,11 @@ function drawSpeechBubble(x, y, text, alpha) {
     const ph = 22;
     const bx = x - pw / 2;
     const by = y - 38 - ph;
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
     ctx.beginPath();
     ctx.roundRect ? ctx.roundRect(bx, by, pw, ph, 4) : ctx.rect(bx, by, pw, ph);
     ctx.fill();
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x, by + ph / 2);
@@ -2313,7 +2309,7 @@ function animate() {
         fadeTracks();
         
         // --- FIX: Handle Player-Controlled Battle Tank ---
-        if (currentField === "battle" && playerBattleTank && battleConnectionReady && battleFirstStateReceived) {
+        if (currentField === "battle" && playerBattleTank) {
             let turnInput = 0;
             let moveInput = 0;
             if (keys.w) moveInput = 1;
@@ -2575,17 +2571,6 @@ function animate() {
             ctx.restore();
         }
     }
-    if (currentField === "battle") {
-        for (const sb of speechBubbles) {
-            const alpha = Math.min(1, sb.life * 2);
-            if (sb.userId === currentUser.id && playerBattleTank) {
-                drawSpeechBubble(playerBattleTank.x, playerBattleTank.y, sb.text, alpha);
-            } else {
-                const enemy = enemyPlayers.find(e => e.id === sb.userId);
-                if (enemy) drawSpeechBubble(enemy.x, enemy.y, sb.text, alpha);
-            }
-        }
-    }
     ctx.restore();
     if (currentField === "battle" && playerBattleTank && playerBattleTank.hp !== undefined && playerBattleTank.maxHP) {
         const hpW = 400;
@@ -2619,6 +2604,17 @@ function animate() {
         ctx.textBaseline = "top";
         ctx.fillStyle = "#ddd";
         ctx.fillText("HP", hpX - 32, hpY + 3);
+    }
+    if (currentField === "battle") {
+        for (const sb of speechBubbles) {
+            const alpha = Math.min(1, sb.life * 2);
+            if (sb.userId === currentUser.id && playerBattleTank) {
+                drawSpeechBubble(playerBattleTank.x, playerBattleTank.y, sb.text, alpha);
+            } else {
+                const enemy = enemyPlayers.find(e => e.id === sb.userId);
+                if (enemy) drawSpeechBubble(enemy.x, enemy.y, sb.text, alpha);
+            }
+        }
     }
     requestAnimationFrame(animate);
 }
