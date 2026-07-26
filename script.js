@@ -197,7 +197,7 @@ const pivotShifts = {
     "germany:tank:6": 0.12, "germany:tank:7": 0.08, "germany:tank:8": 0.08, "germany:tank:9": 0.12, "germany:tank:10": 0.12,
     "germany:td:2": 0.10, "germany:td:3": 0.10, "germany:td:6": 0.10, "germany:td:7": 0.10, "germany:td:8": 0.10, "germany:td:9": 0.10, "germany:td:10": 0.10,
     "usa:tank:5": 0.10, "usa:tank:6": 0.17, "usa:tank:7": 0.14, "usa:tank:8": 0.14, "usa:tank:9": 0.08, "usa:tank:10": 0.08,
-    "usa:td:7": 0.16, "usa:td:8": 0.12, "usa:td:9": 0.13, "usa:td:10": 0.16
+    "usa:td:7": 0.16, "usa:td:8": 0.12, "usa:td:9": 0.13, "usa:td:10": 0.18
 };
 const SECRET_TANK_NATION = "ratte";
 const SECRET_TANK_TIER = 11;
