@@ -2757,7 +2757,7 @@ function startRenameTank(tank) {
     renameInput.value = tank.labelName;
     renameInput.style.cssText = "background:rgba(12,20,15,0.94);color:#f5f5f5;border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:6px 10px;font:14px sans-serif;text-align:center;outline:none;width:140px;";
     renameInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") { const t = renameTarget; commitRename(); pendingBattleTank = t; showDialog(battleConfirmDialog); hideDialog(pauseDialog); }
+        if (e.key === "Enter") { const t = renameTarget; commitRename(); if (!(t.nation === SECRET_TANK_NATION && t.tier === SECRET_TANK_TIER)) { pendingBattleTank = t; showDialog(battleConfirmDialog); hideDialog(pauseDialog); } }
         if (e.key === "Escape") { cancelRename(); }
     });
     let blurTimer = null;
@@ -2774,7 +2774,8 @@ function startRenameTank(tank) {
     battleButton.addEventListener("click", () => { const t = renameTarget; commitRename(); pendingBattleTank = t; showDialog(battleConfirmDialog); hideDialog(pauseDialog); });
     battleButton.addEventListener("mousedown", (e) => e.stopPropagation());
     renameContainer.appendChild(renameInput);
-    renameContainer.appendChild(battleButton);
+    const isRatte = tank.nation === SECRET_TANK_NATION && tank.tier === SECRET_TANK_TIER;
+    if (!isRatte) renameContainer.appendChild(battleButton);
     positionRenameInput();
     document.body.appendChild(renameContainer);
     renameInput.focus();
@@ -2794,6 +2795,7 @@ function positionRenameInput() {
 
 function sendToBattle(tank) {
     if (!tank) return;
+    if (tank.nation === SECRET_TANK_NATION && tank.tier === SECRET_TANK_TIER) return;
     
     // 1. Close the popup immediately
     closeAllDialogs();
