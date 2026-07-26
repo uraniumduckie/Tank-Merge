@@ -276,17 +276,21 @@ async function initAuth() {
     }
 }
 
-function hideOverlayStartGame() {
+function tryStartGame() {
+    if (!authReady || loadingLoaded < loadingTotal) return;
     document.getElementById('loadingOverlay').classList.add('hidden');
     document.getElementById('startOverlay').classList.add('hidden');
     document.getElementById('gameUI').classList.remove('hidden');
     if (currentUser && !currentUser.is_guest) startEngine();
     updateAdminDashboardButton();
-    
-    // --- FIX: Only start the battle connection AFTER the game UI is shown ---
     if (currentField === "battle") {
         connectBattleWebSocket();
     }
+}
+
+function hideOverlayStartGame() {
+    authReady = true;
+    tryStartGame();
 }
 
 function updateAdminDashboardButton() {
@@ -598,6 +602,39 @@ const tdFiles = {
 
 const tankImages = {};
 const tankHitboxData = {};
+let loadingTotal = 0;
+let loadingLoaded = 0;
+let authReady = false;
+
+function updateLoadingProgress() {
+    const inner = document.getElementById('loadingBarInner');
+    const text = document.getElementById('loadingProgressText');
+    if (inner && text) {
+        const pct = loadingTotal > 0 ? Math.round((loadingLoaded / loadingTotal) * 100) : 0;
+        inner.style.width = pct + '%';
+        text.textContent = loadingLoaded + ' / ' + loadingTotal;
+    }
+}
+
+function preloadAllAssets() {
+    const loaded = new Set();
+    for (const tank of tanks) {
+        const key = `${tank.nation}:${tank.vehicleClass || 'tank'}:${tank.tier}`;
+        if (!loaded.has(key)) {
+            loaded.add(key);
+            getTankImage(tank.nation, tank.tier, tank.vehicleClass || 'tank');
+        }
+    }
+    for (const n of nations) {
+        for (let t = 1; t <= 10; t++) {
+            if (!loaded.has(`${n}:tank:${t}`)) getTankImage(n, t, 'tank');
+            if (!loaded.has(`${n}:td:${t}`)) getTankImage(n, t, 'td');
+        }
+    }
+    if (!loaded.has(`${SECRET_TANK_NATION}:tank:${SECRET_TANK_TIER}`)) {
+        getTankImage(SECRET_TANK_NATION, SECRET_TANK_TIER, 'tank');
+    }
+}
 
 function computeTankHitbox(key) {
     const img = tankImages[key];
@@ -626,8 +663,12 @@ function computeTankHitbox(key) {
 function getTankImage(nation, tier, vehicleClass = "tank") {
     const key = `${nation}:${vehicleClass}:${tier}`;
     if (!tankImages[key]) {
+        loadingTotal++;
+        updateLoadingProgress();
         const img = new Image();
-        img.onload = () => computeTankHitbox(key);
+        const onDone = () => { computeTankHitbox(key); loadingLoaded++; updateLoadingProgress(); tryStartGame(); };
+        img.onload = onDone;
+        img.onerror = onDone;
         if (nation === SECRET_TANK_NATION && tier === SECRET_TANK_TIER) {
             img.src = "assets/ratte.png";
         } else {
@@ -2646,7 +2687,7 @@ updateAdminButton();
 updateExplodeButton();
 renderNationDropdown();
 updateUnlockCounter();
-for (const n of nations) { getTankImage(n, 1, "tank"); getTankImage(n, 2, "tank"); }
+preloadAllAssets();
 animate();
 // connectBattleWebSocket(); // Connect to battle server
 setInterval(() => { if (currentUser && getToken()) syncProgress(); }, 30000);
@@ -2655,15 +2696,17 @@ const loadingOverlay = document.getElementById('loadingOverlay');
 const startOverlay = document.getElementById('startOverlay');
 if (getToken()) {
     setTimeout(() => {
-        if (!currentUser) {
+        if (!authReady) {
             loadingOverlay.classList.add('hidden');
             startOverlay.classList.remove('hidden');
         }
     }, 3000);
 } else {
     setTimeout(() => {
-        loadingOverlay.classList.add('hidden');
-        startOverlay.classList.remove('hidden');
+        if (!authReady) {
+            loadingOverlay.classList.add('hidden');
+            startOverlay.classList.remove('hidden');
+        }
     }, 600);
 }
 

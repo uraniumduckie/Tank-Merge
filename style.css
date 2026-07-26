@@ -173,9 +173,30 @@ html, body {
 }
 
 .loadingText {
-    margin: 0;
+    margin: 0 0 12px;
     color: #8a9a8a;
     font-size: 14px;
+}
+.loadingBarOuter {
+    width: 180px;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+.loadingBarInner {
+    height: 100%;
+    width: 0%;
+    background: #8aba8a;
+    border-radius: 4px;
+    transition: width 0.2s;
+}
+.loadingProgressText {
+    margin: 6px 0 0;
+    color: #6a8a6a;
+    font-size: 11px;
+    text-align: center;
 }
 
 canvas {
