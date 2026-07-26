@@ -2129,6 +2129,8 @@ function updateBattlePlayers(players, bullets) {
             inc.prevX = inc.x; inc.prevY = inc.y; inc.prevAngle = inc.angle;
             inc.lx = inc.x; inc.ly = inc.y; inc.la = inc.angle;
             inc.lastUpdate = now;
+            inc.lastTrackX = inc.x;
+            inc.lastTrackY = inc.y;
             enemyPlayers.push(inc);
         }
     }
@@ -2345,6 +2347,13 @@ function animate() {
             
             playerBattleTank.resolveMovement();
             
+            // Generate track marks when moving
+            if (playerBattleTank.x !== playerBattleTank.lastTrackX || playerBattleTank.y !== playerBattleTank.lastTrackY) {
+                drawTrackSegment(playerBattleTank.lastTrackX, playerBattleTank.lastTrackY, playerBattleTank.x, playerBattleTank.y, playerBattleTank.getDisplayWidth());
+                playerBattleTank.lastTrackX = playerBattleTank.x;
+                playerBattleTank.lastTrackY = playerBattleTank.y;
+            }
+            
             // Re-sync with server frequently
             if (ws && ws.readyState === WebSocket.OPEN) {
                 const now = Date.now();
@@ -2437,6 +2446,12 @@ function animate() {
                 while (da > Math.PI) da -= Math.PI * 2;
                 while (da < -Math.PI) da += Math.PI * 2;
                 enemy.angle = enemy.prevAngle + da * t;
+            }
+            if (enemy.x !== enemy.lastTrackX || enemy.y !== enemy.lastTrackY) {
+                const displayWidth = computeDisplayWidth(enemy.nation, enemy.tier, enemy.vehicleClass || "tank");
+                drawTrackSegment(enemy.lastTrackX, enemy.lastTrackY, enemy.x, enemy.y, displayWidth);
+                enemy.lastTrackX = enemy.x;
+                enemy.lastTrackY = enemy.y;
             }
             drawEnemyTank(enemy);
         }
