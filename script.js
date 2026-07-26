@@ -663,6 +663,11 @@ function computeTankHitbox(key) {
         hb.y += hb.h * 0.4;
         hb.h *= 0.6;
     }
+    if (key === "germany:tank:9" || key === "germany:tank:10") {
+        const hb = tankHitboxData[key];
+        hb.y += hb.h * 0.3;
+        hb.h *= 0.7;
+    }
 }
 
 function getTankImage(nation, tier, vehicleClass = "tank") {
@@ -2056,6 +2061,10 @@ chatInput.addEventListener('keydown', (e) => {
 chatInput.addEventListener('blur', () => {
     isChatOpen = false;
     chatInput.placeholder = 'Press T to chat';
+    keys.w = false;
+    keys.a = false;
+    keys.s = false;
+    keys.d = false;
 });
 
 function connectBattleWebSocket() {
