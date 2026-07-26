@@ -657,7 +657,7 @@ function computeTankHitbox(key) {
     }
     if (maxX < minX || maxY < minY) { minX = 0; minY = 0; maxX = c.width; maxY = c.height; }
     tankHitboxData[key] = { x: minX / c.width, y: minY / c.height, w: (maxX - minX + 1) / c.width, h: (maxY - minY + 1) / c.height };
-    
+    if (key === "usa:td:10") {
         const hb = tankHitboxData[key];
         hb.y += hb.h * 0.4;
         hb.h *= 0.6;
