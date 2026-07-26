@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tank Merge - Bullet Spawn Editor</title>
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        body { background: #0d1212; color: #ddd; font-family: sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+        header { background: #141e1a; padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #2a3a30; flex-shrink: 0; }
+        header h1 { margin: 0; font-size: 18px; color: #d0a0a0; }
+        header button { background: #2a3a30; color: #ddd; border: 1px solid #4a6a55; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 13px; }
+        header button:hover { background: #3a5a45; }
+        #status { margin-left: auto; font-size: 13px; color: #8a9a90; }
+        #editorLayout { display: flex; flex: 1; overflow: hidden; }
+        #leftPanel { width: 300px; min-width: 300px; background: #0f1814; border-right: 1px solid #2a3a30; display: flex; flex-direction: column; overflow-y: auto; }
+        #canvasPanel { flex: 1; display: flex; align-items: center; justify-content: center; background: #0a0f0d; position: relative; overflow: hidden; }
+        #tankCanvas { image-rendering: pixelated; cursor: crosshair; max-width: 100%; max-height: 100%; }
+        .panel-section { padding: 14px 16px; border-bottom: 1px solid #1a2820; }
+        .panel-section h3 { margin: 0 0 10px 0; font-size: 13px; color: #b08a8a; text-transform: uppercase; letter-spacing: 1px; }
+        .form-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .form-row label { width: 60px; font-size: 12px; color: #9aaea0; flex-shrink: 0; }
+        .form-row select, .form-row input[type="number"] { flex: 1; background: #1a2820; color: #ddd; border: 1px solid #2a4a35; border-radius: 4px; padding: 4px 6px; font-size: 12px; }
+        .form-row select option { background: #1a2820; }
+        .form-row input[type="number"] { width: 70px; flex: none; }
+        .btn-row { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-row button { flex: 1; background: #2a4a35; color: #ddd; border: 1px solid #4a7a55; border-radius: 6px; padding: 8px 10px; cursor: pointer; font-size: 12px; }
+        .btn-row button:hover { background: #3a6a45; }
+        .btn-row button.danger { background: #4a2020; border-color: #7a4040; }
+        .btn-row button.danger:hover { background: #6a3030; }
+        .btn-row button.primary { background: #4a2a1a; border-color: #7a5a3a; }
+        .btn-row button.primary:hover { background: #5a3a2a; }
+        #overrideList { flex: 1; overflow-y: auto; }
+        .override-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid #1a2820; font-size: 11px; }
+        .override-item:hover { background: #16241e; }
+        .override-item .key { color: #d0a0a0; font-family: monospace; cursor: pointer; }
+        .override-item .key:hover { color: #f0c0c0; }
+        .override-item .vals { color: #7a9a8a; }
+        .override-item .del-btn { background: none; border: none; color: #7a4040; cursor: pointer; font-size: 14px; padding: 2px 6px; }
+        .override-item .del-btn:hover { color: #c06060; }
+        .empty-overrides { padding: 20px; text-align: center; color: #5a6a5a; font-size: 13px; }
+        .track-info { font-size: 11px; color: #6a8a7a; margin-top: 4px; }
+        #imageInfo { font-size: 11px; color: #7a9a8a; position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 4px 12px; border-radius: 4px; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bullet Spawn Editor</h1>
+        <button id="backToGame">Back to Game</button>
+        <button id="backToAdmin">Admin Dashboard</button>
+        <span id="status">Loading...</span>
+    </header>
+
+    <div id="editorLayout">
+        <div id="leftPanel">
+            <div class="panel-section">
+                <h3>Tank Selection</h3>
+                <div class="form-row">
+                    <label>Nation</label>
+                    <select id="nationSelect">
+                        <option value="usa">USA</option>
+                        <option value="ussr">USSR</option>
+                        <option value="germany">Germany</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Class</label>
+                    <select id="classSelect">
+                        <option value="tank">Tank</option>
+                        <option value="td">TD</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Tier</label>
+                    <input type="range" id="tierSlider" min="1" max="10" value="1" style="flex:1;padding:0;">
+                    <span id="tierLabel">1</span>
+                </div>
+                <div class="track-info" id="assetName">Loading...</div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Spawn Point</h3>
+                <div class="form-row">
+                    <label>SX</label>
+                    <input type="number" id="spawnX" min="-1" max="2" step="0.005" value="0.5">
+                </div>
+                <div class="form-row">
+                    <label>SY</label>
+                    <input type="number" id="spawnY" min="-1" max="2" step="0.005" value="0">
+                </div>
+                <div class="btn-row">
+                    <button id="setFrontBtn" class="primary">Set at Front</button>
+                    <button id="saveBtn" class="primary">Save</button>
+                    <button id="deleteBtn" class="danger">Delete</button>
+                </div>
+            </div>
+
+            <div class="panel-section" style="flex:1;">
+                <h3>Saved Spawn Points <span id="overrideCount" style="color:#6a8a7a;">(0)</span></h3>
+                <div id="overrideList">
+                    <div class="empty-overrides">No spawn overrides saved yet.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="canvasPanel">
+            <canvas id="tankCanvas"></canvas>
+            <div id="imageInfo"></div>
+        </div>
+    </div>
+
+    <script src="spawn-editor.js"></script>
+</body>
+</html>

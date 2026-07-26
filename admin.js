@@ -32,6 +32,7 @@ async function checkAuth() {
             statusEl.textContent = `Logged in as ${result.data.user.username} (admin)`;
             logoutBtn.classList.remove('hidden');
             document.getElementById('hitboxEditorBtn').classList.remove('hidden');
+            document.getElementById('spawnEditorBtn').classList.remove('hidden');
             return true;
         } else {
             statusEl.textContent = `${result.data.user.username} — not an admin. Admin access required.`;
@@ -369,6 +370,7 @@ document.getElementById('backToListBtn').addEventListener('click', () => {
 document.getElementById('refreshBtn').addEventListener('click', () => location.reload());
 document.getElementById('logoutBtn').addEventListener('click', () => { clearToken(); location.reload(); });
 document.getElementById('hitboxEditorBtn').addEventListener('click', () => { window.location.href = '/hitbox-editor.html'; });
+document.getElementById('spawnEditorBtn').addEventListener('click', () => { window.location.href = '/spawn-editor.html'; });
 
 loadDashboard();
 

@@ -718,6 +718,66 @@ function computeTankHitbox(key) {
     if (key === "germany:td:8") { if (__o) { __o.x = 0.0099; __o.y = 0.3103; __o.w = 0.9901; __o.h = 0.6494; } }
     if (key === "germany:td:9") { if (__o) { __o.x = 0.0187; __o.y = 0.2857; __o.w = 0.9676; __o.h = 0.6751; } }
     if (key === "germany:td:10") { if (__o) { __o.x = 0.0204; __o.y = 0.3037; __o.w = 0.9611; __o.h = 0.6831; } }
+    if (key === "usa:tank:1") { if (__o) __o.spawn = { sx: 0.513, sy: 0.010 }; }
+    if (key === "usa:tank:2") { if (__o) __o.spawn = { sx: 0.522, sy: 0.007 }; }
+    if (key === "usa:tank:3") { if (__o) __o.spawn = { sx: 0.503, sy: 0.006 }; }
+    if (key === "usa:tank:4") { if (__o) __o.spawn = { sx: 0.503, sy: 0.020 }; }
+    if (key === "usa:tank:5") { if (__o) __o.spawn = { sx: 0.515, sy: 0.016 }; }
+    if (key === "usa:tank:6") { if (__o) __o.spawn = { sx: 0.504, sy: 0.019 }; }
+    if (key === "usa:tank:7") { if (__o) __o.spawn = { sx: 0.511, sy: 0.007 }; }
+    if (key === "usa:tank:8") { if (__o) __o.spawn = { sx: 0.484, sy: 0.007 }; }
+    if (key === "usa:tank:9") { if (__o) __o.spawn = { sx: 0.510, sy: 0.003 }; }
+    if (key === "usa:tank:10") { if (__o) __o.spawn = { sx: 0.500, sy: 0.000 }; }
+    if (key === "ussr:tank:1") { if (__o) __o.spawn = { sx: 0.459, sy: 0.008 }; }
+    if (key === "ussr:tank:2") { if (__o) __o.spawn = { sx: 0.500, sy: 0.000 }; }
+    if (key === "ussr:tank:3") { if (__o) __o.spawn = { sx: 0.493, sy: 0.003 }; }
+    if (key === "ussr:tank:4") { if (__o) __o.spawn = { sx: 0.520, sy: 0.008 }; }
+    if (key === "ussr:tank:5") { if (__o) __o.spawn = { sx: 0.500, sy: 0.000 }; }
+    if (key === "ussr:tank:6") { if (__o) __o.spawn = { sx: 0.500, sy: 0.019 }; }
+    if (key === "ussr:tank:7") { if (__o) __o.spawn = { sx: 0.514, sy: 0.003 }; }
+    if (key === "ussr:tank:8") { if (__o) __o.spawn = { sx: 0.500, sy: 0.015 }; }
+    if (key === "ussr:tank:9") { if (__o) __o.spawn = { sx: 0.507, sy: 0.020 }; }
+    if (key === "ussr:tank:10") { if (__o) __o.spawn = { sx: 0.503, sy: 0.004 }; }
+    if (key === "germany:tank:1") { if (__o) __o.spawn = { sx: 0.677, sy: 0.096 }; }
+    if (key === "germany:tank:2") { if (__o) __o.spawn = { sx: 0.312, sy: 0.047 }; }
+    if (key === "germany:tank:3") { if (__o) __o.spawn = { sx: 0.480, sy: 0.008 }; }
+    if (key === "germany:tank:4") { if (__o) __o.spawn = { sx: 0.491, sy: 0.023 }; }
+    if (key === "germany:tank:5") { if (__o) __o.spawn = { sx: 0.496, sy: 0.015 }; }
+    if (key === "germany:tank:6") { if (__o) __o.spawn = { sx: 0.503, sy: 0.028 }; }
+    if (key === "germany:tank:7") { if (__o) __o.spawn = { sx: 0.508, sy: 0.019 }; }
+    if (key === "germany:tank:8") { if (__o) __o.spawn = { sx: 0.500, sy: 0.015 }; }
+    if (key === "germany:tank:9") { if (__o) __o.spawn = { sx: 0.500, sy: 0.000 }; }
+    if (key === "germany:tank:10") { if (__o) __o.spawn = { sx: 0.500, sy: 0.016 }; }
+    if (key === "usa:td:1") { if (__o) __o.spawn = { sx: 0.503, sy: 0.086 }; }
+    if (key === "usa:td:2") { if (__o) __o.spawn = { sx: 0.512, sy: 0.020 }; }
+    if (key === "usa:td:3") { if (__o) __o.spawn = { sx: 0.671, sy: 0.011 }; }
+    if (key === "usa:td:4") { if (__o) __o.spawn = { sx: 0.513, sy: 0.007 }; }
+    if (key === "usa:td:5") { if (__o) __o.spawn = { sx: 0.514, sy: 0.020 }; }
+    if (key === "usa:td:6") { if (__o) __o.spawn = { sx: 0.513, sy: 0.023 }; }
+    if (key === "usa:td:7") { if (__o) __o.spawn = { sx: 0.593, sy: 0.022 }; }
+    if (key === "usa:td:8") { if (__o) __o.spawn = { sx: 0.503, sy: 0.027 }; }
+    if (key === "usa:td:9") { if (__o) __o.spawn = { sx: 0.500, sy: 0.027 }; }
+    if (key === "usa:td:10") { if (__o) __o.spawn = { sx: 0.511, sy: 0.031 }; }
+    if (key === "ussr:td:1") { if (__o) __o.spawn = { sx: 0.510, sy: 0.165 }; }
+    if (key === "ussr:td:2") { if (__o) __o.spawn = { sx: 0.513, sy: 0.024 }; }
+    if (key === "ussr:td:3") { if (__o) __o.spawn = { sx: 0.431, sy: 0.035 }; }
+    if (key === "ussr:td:4") { if (__o) __o.spawn = { sx: 0.442, sy: 0.028 }; }
+    if (key === "ussr:td:5") { if (__o) __o.spawn = { sx: 0.601, sy: 0.020 }; }
+    if (key === "ussr:td:6") { if (__o) __o.spawn = { sx: 0.576, sy: 0.014 }; }
+    if (key === "ussr:td:7") { if (__o) __o.spawn = { sx: 0.510, sy: 0.015 }; }
+    if (key === "ussr:td:8") { if (__o) __o.spawn = { sx: 0.562, sy: 0.019 }; }
+    if (key === "ussr:td:9") { if (__o) __o.spawn = { sx: 0.591, sy: 0.018 }; }
+    if (key === "ussr:td:10") { if (__o) __o.spawn = { sx: 0.528, sy: 0.023 }; }
+    if (key === "germany:td:1") { if (__o) __o.spawn = { sx: 0.539, sy: 0.037 }; }
+    if (key === "germany:td:2") { if (__o) __o.spawn = { sx: 0.466, sy: 0.024 }; }
+    if (key === "germany:td:3") { if (__o) __o.spawn = { sx: 0.489, sy: 0.023 }; }
+    if (key === "germany:td:4") { if (__o) __o.spawn = { sx: 0.648, sy: 0.019 }; }
+    if (key === "germany:td:5") { if (__o) __o.spawn = { sx: 0.551, sy: 0.023 }; }
+    if (key === "germany:td:6") { if (__o) __o.spawn = { sx: 0.492, sy: 0.024 }; }
+    if (key === "germany:td:7") { if (__o) __o.spawn = { sx: 0.561, sy: 0.012 }; }
+    if (key === "germany:td:8") { if (__o) __o.spawn = { sx: 0.516, sy: 0.011 }; }
+    if (key === "germany:td:9") { if (__o) __o.spawn = { sx: 0.527, sy: 0.019 }; }
+    if (key === "germany:td:10") { if (__o) __o.spawn = { sx: 0.504, sy: 0.027 }; }
 }
 
 function getTankImage(nation, tier, vehicleClass = "tank") {
@@ -1395,9 +1455,12 @@ class Tank {
             ctx.save();
             ctx.translate(d.x, d.y);
             ctx.rotate(this.angle + Math.PI / 2);
-            ctx.translate(0, -this.getPivotShift());
+            const hbKey = `${this.nation}:${this.vehicleClass}:${this.tier}`;
+            const hbData = tankHitboxData[hbKey];
+            const imgDx = hbData ? -(hbData.x + hbData.w / 2) * displayWidth : -displayWidth / 2;
+            const imgDy = hbData ? -(hbData.y + hbData.h / 2) * displayHeight : -displayHeight / 2;
             if (tankImage.complete && tankImage.naturalWidth > 0) {
-                ctx.drawImage(tankImage, frameRect.sx, frameRect.sy, frameRect.sw, frameRect.sh, -displayWidth / 2, -displayHeight / 2, displayWidth, displayHeight);
+                ctx.drawImage(tankImage, frameRect.sx, frameRect.sy, frameRect.sw, frameRect.sh, imgDx, imgDy, displayWidth, displayHeight);
             } else {
                 const t = Date.now() / 800;
                 ctx.strokeStyle = tankColors[this.nation] || "#ffffff";
@@ -2045,9 +2108,20 @@ document.addEventListener('keydown', (e) => {
         const dw2 = playerBattleTank.getDisplayWidth();
         const frame = getFrameRect(playerBattleTank.nation, playerBattleTank.tier, playerBattleTank.vehicleClass);
         const dh2 = dw2 * frame.sh / frame.sw;
-        const frontDist = dh2 / 2 + playerBattleTank.getPivotShift() + 2;
-        const bx = playerBattleTank.x + Math.cos(playerBattleTank.angle) * frontDist;
-        const by = playerBattleTank.y + Math.sin(playerBattleTank.angle) * frontDist;
+        const hbKey2 = `${playerBattleTank.nation}:${playerBattleTank.vehicleClass}:${playerBattleTank.tier}`;
+        const hbData2 = tankHitboxData[hbKey2];
+        let bx, by;
+        if (hbData2 && hbData2.spawn) {
+            const sp = hbData2.spawn;
+            const xOff = dw2 * (sp.sx - hbData2.x - hbData2.w / 2);
+            const fwd = dh2 * (hbData2.y + hbData2.h / 2 - sp.sy);
+            bx = playerBattleTank.x + xOff * (-Math.sin(playerBattleTank.angle)) + fwd * Math.cos(playerBattleTank.angle);
+            by = playerBattleTank.y + xOff * Math.cos(playerBattleTank.angle) + fwd * Math.sin(playerBattleTank.angle);
+        } else {
+            const frontDist = hbData2 ? hbData2.h * dh2 / 2 + 2 : dh2 / 2 + playerBattleTank.getPivotShift() + 2;
+            bx = playerBattleTank.x + Math.cos(playerBattleTank.angle) * frontDist;
+            by = playerBattleTank.y + Math.sin(playerBattleTank.angle) * frontDist;
+        }
         effects.push({
             x: bx, y: by, life: 1, particles: [1],
             update() { this.life -= 0.06; if (this.life <= 0) this.particles.pop(); },
@@ -2266,9 +2340,12 @@ function drawEnemyTank(enemy) {
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.rotate(enemy.angle + Math.PI / 2);
-    ctx.translate(0, -getEnemyPivotShift(enemy.nation, enemy.tier, enemy.vehicleClass || "tank"));
+    const eKey = `${enemy.nation}:${enemy.vehicleClass || "tank"}:${enemy.tier}`;
+    const eHb = tankHitboxData[eKey];
+    const eDx = eHb ? -(eHb.x + eHb.w / 2) * displayWidth : -displayWidth / 2;
+    const eDy = eHb ? -(eHb.y + eHb.h / 2) * displayHeight : -displayHeight / 2;
     if (img.complete && img.naturalWidth > 0) {
-        ctx.drawImage(img, frameRect.sx, frameRect.sy, frameRect.sw, frameRect.sh, -displayWidth / 2, -displayHeight / 2, displayWidth, displayHeight);
+        ctx.drawImage(img, frameRect.sx, frameRect.sy, frameRect.sw, frameRect.sh, eDx, eDy, displayWidth, displayHeight);
     } else {
         const t = Date.now() / 800;
         ctx.strokeStyle = tankColors[enemy.nation] || "#fff";
@@ -2766,7 +2843,9 @@ async function loadHitboxOverrides() {
 }
 function applyHitboxOverrides() {
     if (!hitboxOverrides) return;
+    const spawnData = hitboxOverrides.spawn || {};
     for (const [key, hb] of Object.entries(hitboxOverrides)) {
+        if (key === 'spawn') continue;
         if (tankHitboxData[key]) {
             tankHitboxData[key].x = hb.x;
             tankHitboxData[key].y = hb.y;
@@ -2774,6 +2853,13 @@ function applyHitboxOverrides() {
             tankHitboxData[key].h = hb.h;
         } else {
             tankHitboxData[key] = { x: hb.x, y: hb.y, w: hb.w, h: hb.h };
+        }
+    }
+    for (const [key, sp] of Object.entries(spawnData)) {
+        if (tankHitboxData[key]) {
+            tankHitboxData[key].spawn = sp;
+        } else {
+            tankHitboxData[key] = { x: 0, y: 0, w: 1, h: 1, spawn: sp };
         }
     }
 }

@@ -367,12 +367,13 @@ classSelect.addEventListener('change', loadCurrentImage);
 
 saveBtn.addEventListener('click', async () => {
     const key = getCurrentKey();
-    overrides[key] = {
+    const entry = {
         x: parseFloat(hbX.value) || 0,
         y: parseFloat(hbY.value) || 0,
         w: parseFloat(hbW.value) || 1,
         h: parseFloat(hbH.value) || 1,
     };
+    overrides[key] = entry;
     await saveOverrides();
     renderOverrideList();
     renderCanvas();
@@ -430,7 +431,7 @@ copyCode.addEventListener('click', () => {
 });
 
 function renderOverrideList() {
-    const keys = Object.keys(overrides);
+    const keys = Object.keys(overrides).filter(k => k !== 'spawn');
     overrideCount.textContent = `(${keys.length})`;
     if (keys.length === 0) {
         overrideList.innerHTML = '<div class="empty-overrides">No overrides saved yet.</div>';
