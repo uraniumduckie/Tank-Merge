@@ -673,8 +673,7 @@ function computeTankHitbox(key) {
         hb.y += hb.h * 0.5;
         hb.h *= 0.5;
     }
-    if (key === "germany:td:10"
-        || key === "germany:td:9"
+    if (key === "germany:td:9"
         || key === "germany:td:7"
         || key === "germany:td:5"
         || key === "germany:td:4"
@@ -700,6 +699,7 @@ function computeTankHitbox(key) {
         hb.h *= 0.6;
     }
     if (key === "germany:tank:10" 
+        || key === "germany:td:10"
         || key === "germany:tank:9"
         || key === "germany:tank:8"
         || key === "germany:tank:7"
