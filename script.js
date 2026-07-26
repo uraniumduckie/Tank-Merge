@@ -186,7 +186,7 @@ const tdNames = {
     germany: ["Panzerjäger I", "Marder II", "Marder III", "Hetzer", "StuG III", "Nashorn", "Jagdpanzer IV", "Jagdtiger", "Jagdpanzer", "Jagdpanzer E 100"]
 };
 const tierSizeOverrides = {
-    germany: { tank: { 1: 16, 2: 8, 9: -8, 10: 48 }, td: { 1: 12, 8: 24, 10: 48 } },
+    germany: { tank: { 1: 16, 2: 8, 9: 16, 10: 48 }, td: { 1: 12, 8: 24, 10: 48 } },
     ussr: { tank: { 2: -8, 3: 8, 5: -8, 6: 12, 7: -20, 8: -20, 9: -22, 10: -16 }, td: { 5: 10, 9: -20, 10: -20 } },
     usa: { tank: { 5: 36, 6: 36, 8: 16, 9: 20, 10: 24 }, td: { 7: 20, 8: -20, 9: 16, 10: 16 } }
 };
