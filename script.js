@@ -2265,11 +2265,11 @@ function drawSpeechBubble(x, y, text, alpha) {
     const ph = 22;
     const bx = x - pw / 2;
     const by = y - 38 - ph;
-    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.beginPath();
     ctx.roundRect ? ctx.roundRect(bx, by, pw, ph, 4) : ctx.rect(bx, by, pw, ph);
     ctx.fill();
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#000';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x, by + ph / 2);
@@ -2586,6 +2586,17 @@ function animate() {
             ctx.restore();
         }
     }
+    if (currentField === "battle") {
+        for (const sb of speechBubbles) {
+            const alpha = Math.min(1, sb.life * 2);
+            if (sb.userId === currentUser.id && playerBattleTank) {
+                drawSpeechBubble(playerBattleTank.x, playerBattleTank.y, sb.text, alpha);
+            } else {
+                const enemy = enemyPlayers.find(e => e.id === sb.userId);
+                if (enemy) drawSpeechBubble(enemy.x, enemy.y, sb.text, alpha);
+            }
+        }
+    }
     ctx.restore();
     if (currentField === "battle" && playerBattleTank && playerBattleTank.hp !== undefined && playerBattleTank.maxHP) {
         const hpW = 400;
@@ -2619,17 +2630,6 @@ function animate() {
         ctx.textBaseline = "top";
         ctx.fillStyle = "#ddd";
         ctx.fillText("HP", hpX - 32, hpY + 3);
-    }
-    if (currentField === "battle") {
-        for (const sb of speechBubbles) {
-            const alpha = Math.min(1, sb.life * 2);
-            if (sb.userId === currentUser.id && playerBattleTank) {
-                drawSpeechBubble(playerBattleTank.x, playerBattleTank.y, sb.text, alpha);
-            } else {
-                const enemy = enemyPlayers.find(e => e.id === sb.userId);
-                if (enemy) drawSpeechBubble(enemy.x, enemy.y, sb.text, alpha);
-            }
-        }
     }
     requestAnimationFrame(animate);
 }
