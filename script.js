@@ -1168,34 +1168,31 @@ class Tank {
         return result;
     }
     resolveMovement() {
-        const oldX = this.x, oldY = this.y, oldAngle = this.angle;
+        const oldX = this.x, oldY = this.y;
         let newX = this.x + Math.cos(this.angle) * this.speed;
         let newY = this.y + Math.sin(this.angle) * this.speed;
         if (currentField === "battle" && battleWorldWidth) {
-            const hw = this.getDisplayWidth() / 2;
-            newX = Math.max(hw, Math.min(battleWorldWidth - hw, newX));
-            newY = Math.max(hw, Math.min(battleWorldHeight - hw, newY));
+            const hb = this.getHitbox();
+            const radius = Math.sqrt(hb.w * hb.w + hb.h * hb.h) / 2 + 1;
+            newX = Math.max(radius, Math.min(battleWorldWidth - radius, newX));
+            newY = Math.max(radius, Math.min(battleWorldHeight - radius, newY));
             this.x = newX;
             this.y = newY;
             if (battleObstacleMap && this._overlapsAt(newX, newY)) {
                 if (!this._overlapsAt(newX, oldY)) {
                     this.x = newX;
                     this.y = oldY;
-                    this.speed *= 0.7;
+                    this.speed *= 0.5;
                 } else if (!this._overlapsAt(oldX, newY)) {
                     this.x = oldX;
                     this.y = newY;
-                    this.speed *= 0.7;
+                    this.speed *= 0.5;
                 } else {
                     this.x = oldX;
                     this.y = oldY;
-                    this.angle = oldAngle;
                     this.speed = 0;
                     this.turnSpeed = 0;
                 }
-            }
-            if (this.x === oldX && this.y === oldY && (newX !== oldX || newY !== oldY)) {
-                this.speed = 0;
             }
             const myHb = this.getHitbox();
             for (const enemy of enemyPlayers) {
@@ -1206,16 +1203,17 @@ class Tank {
                 const dy = this.y - enemy.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < 0.01) continue;
-                const overlap = 4;
                 const nx = dx / dist, ny = dy / dist;
-                this.x += nx * overlap;
-                this.y += ny * overlap;
+                const pushX = this.x + nx * 4;
+                const pushY = this.y + ny * 4;
+                if (!battleObstacleMap || !this._overlapsAt(pushX, pushY)) {
+                    this.x = pushX;
+                    this.y = pushY;
+                }
                 this.speed *= 0.5;
             }
-            if (battleObstacleMap && this._overlapsAt(this.x, this.y)) {
-                this.x = oldX;
-                this.y = oldY;
-            }
+            this.x = Math.max(radius, Math.min(battleWorldWidth - radius, this.x));
+            this.y = Math.max(radius, Math.min(battleWorldHeight - radius, this.y));
         } else {
             this.x = newX;
             this.y = newY;
@@ -3065,7 +3063,7 @@ confirmResetButton.addEventListener("click", () => {
 adminPassword.addEventListener("input", () => adminError.classList.add("hidden"));
 confirmAdminButton.addEventListener("click", () => {
     const pw = adminPassword.value.trim();
-    if (pw === "1337") {
+    if (pw === "VladLox") {
         adminMode = true; saveAdminMode(); adminError.classList.add("hidden");
         updateAdminButton(); renderNationDropdown(); if (currentTechTreeNation) renderTechTree(currentTechTreeNation); closeAllDialogs();
     } else {
