@@ -1,0 +1,46 @@
+{
+  "name": "tank-merge",
+  "version": "1.0.0",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "server": "node server/server.js",
+    "dist": "electron-builder --win portable",
+    "dist:installer": "electron-builder --win nsis",
+    "dist:server": "pkg server/server.js --targets node18-win-x64 --output dist/tank-merge-server.exe"
+  },
+  "build": {
+    "appId": "com.tankmerge.app",
+    "productName": "Tank Merge",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "connect.html",
+      "!node_modules/**/*",
+      "!server/**/*",
+      "!assets/**/*"
+    ],
+    "win": {
+      "target": ["portable"]
+    },
+    "portable": {
+      "artifactName": "Tank-Merge-${version}-portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Tank-Merge-Setup-${version}.exe"
+    },
+    "asar": false
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.1",
+    "nexe": "^5.0.0-beta.4",
+    "pkg": "^5.8.1"
+  }
+}

@@ -5,3 +5,5 @@ server/data.db-shm
 .env
 assets/hi.txt
 assets/engine.mp3.bak
+dist/
+scripts/
