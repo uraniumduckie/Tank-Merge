@@ -402,7 +402,8 @@ canvas {
 #unlockCounter { top: 48px; }
 
 #unlockToggleButton,
-#pauseButton {
+#pauseButton,
+#instructionsButton {
     position: fixed;
     top: 12px;
     z-index: 20;
@@ -422,6 +423,7 @@ canvas {
 
 #unlockToggleButton { left: 12px; }
 #pauseButton { left: 72px; }
+#instructionsButton { left: 132px; font-size: 26px; font-weight: bold; }
 
 .nationDropdown {
     position: fixed;
@@ -740,4 +742,237 @@ canvas {
 
 #chatInput::placeholder {
     color: #555;
+}
+
+.instructionsDialog {
+    background: rgba(12, 20, 15, 0.97);
+    border-radius: 12px;
+    padding: 20px 24px 28px;
+    width: 520px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 80px);
+    color: #f5f5f5;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+.instructionsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.instructionsHeader h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.langButtons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.langBtn {
+    background: rgba(255,255,255,0.08);
+    color: #999;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.langBtn:hover {
+    background: rgba(255,255,255,0.15);
+    color: #ddd;
+}
+
+.langBtn.langActive {
+    background: rgba(80, 200, 80, 0.2);
+    color: #4a8;
+    border-color: rgba(80, 200, 80, 0.3);
+}
+
+.instructionsContent {
+    overflow-y: auto;
+    padding-right: 8px;
+    margin: 12px 0 20px;
+}
+
+.instructionsContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+.instructionsContent::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+}
+
+.instructionSection {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.instructionSection:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.instructionSection h3 {
+    font-size: 18px;
+    margin: 0 0 8px;
+    color: #fff;
+}
+
+.instructionSection p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 10px;
+    color: #bbb;
+}
+
+.instructionHint {
+    font-size: 13px !important;
+    color: #888 !important;
+    font-style: italic;
+    margin-top: 8px !important;
+}
+
+.mergeDiagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.mergeTank {
+    background: #1a2a1a;
+    border: 2px solid #4a8;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #4a8;
+}
+
+.mergeResult {
+    border-color: #fa4;
+    color: #fa4;
+    background: #2a1a1a;
+}
+
+.mergePlus, .mergeArrow {
+    font-size: 20px;
+    color: #888;
+    font-weight: bold;
+}
+
+.mergeArrow {
+    color: #4a8;
+}
+
+.fieldDiagram {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.fieldBox {
+    border: 2px solid;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    background: rgba(0,0,0,0.3);
+}
+
+.battleDiagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.battleStep {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #bbb;
+    text-align: center;
+}
+
+.battleIcon {
+    font-size: 28px;
+}
+
+.battleArrow {
+    font-size: 22px;
+    color: #4a8;
+    font-weight: bold;
+}
+
+.goalDiagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.goalStep {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #bbb;
+    text-align: center;
+}
+
+.goalIcon {
+    font-size: 28px;
+}
+
+.goalArrow {
+    font-size: 22px;
+    color: #fa4;
+    font-weight: bold;
+}
+
+.inlineIcon {
+    font-size: 18px;
+}
+
+kbd {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 12px;
+    font-family: inherit;
+    color: #ddd;
 }

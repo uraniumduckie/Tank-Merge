@@ -1,4 +1,4 @@
-const canvas = document.getElementById("battlefield");
+﻿const canvas = document.getElementById("battlefield");
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = true;
 
@@ -17,7 +17,7 @@ function playSound(src) {
     audio.play();
 }
 
-const engineSound = new Audio("assets/engine.mp3");
+const engineSound = new Audio();
 engineSound.loop = true;
 engineSound.volume = 0;
 let engineStarted = false;
@@ -82,6 +82,9 @@ const battleConfirmDialog = document.getElementById("battleConfirmDialog");
 const confirmBattleButton = document.getElementById("confirmBattleButton");
 const beatGameDialog = document.getElementById("beatGameDialog");
 const confirmBeatGameButton = document.getElementById("confirmBeatGameButton");
+const instructionsDialog = document.getElementById("instructionsDialog");
+const instructionsButton = document.getElementById("instructionsButton");
+const closeInstructionsButton = document.getElementById("closeInstructionsButton");
 let pendingBattleTank = null;
 let battleConnectionReady = false;
 let battleFirstStateReceived = false;
@@ -185,7 +188,7 @@ const tdNames = {
     germany: ["Panzerjäger I", "Marder II", "Marder III", "Hetzer", "StuG III", "Nashorn", "Jagdpanzer IV", "Jagdtiger", "Jagdpanzer", "Jagdpanzer E 100"]
 };
 const tierSizeOverrides = {
-    germany: { tank: { 1: 16, 2: 8, 9: 16, 10: 48 }, td: { 1: 12, 8: 24, 10: 48 } },
+    germany: { tank: { 1: 2, 2: 8, 9: 16, 10: 48 }, td: { 1: 12, 8: 24, 10: 48 } },
     ussr: { tank: { 2: -8, 3: 8, 5: -8, 6: 12, 7: -20, 8: -20, 9: -22, 10: -16 }, td: { 5: 10, 9: -20, 10: -20 } },
     usa: { tank: { 5: 36, 6: 36, 8: 16, 9: 20, 10: 24 }, td: { 7: 20, 8: -20, 9: 16, 10: 16 } }
 };
@@ -263,20 +266,16 @@ async function initAuth() {
             hideOverlayStartGame();
             return;
         }
-        resetLocalState();
-        const guest = await apiFetch('/api/auth/guest', { method: 'POST' });
-        if (guest.ok && guest.data) {
-            setToken(guest.data.token);
-            currentUser = guest.data.user;
-            applyServerProgress(guest.data.progress);
-            await syncProgress();
-            hideOverlayStartGame();
-        }
     }
 }
 
 function tryStartGame() {
-    if (!authReady || loadingLoaded < loadingTotal) return;
+    if (loadingLoaded < loadingTotal) return;
+    if (!authReady) {
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        document.getElementById('startOverlay').classList.remove('hidden');
+        return;
+    }
     document.getElementById('loadingOverlay').classList.add('hidden');
     document.getElementById('startOverlay').classList.add('hidden');
     document.getElementById('gameUI').classList.remove('hidden');
@@ -298,20 +297,6 @@ function updateAdminDashboardButton() {
         btn.classList.remove('hidden');
     } else {
         btn.classList.add('hidden');
-    }
-}
-
-async function startAsGuest() {
-    resetLocalState();
-    const result = await apiFetch('/api/auth/guest', { method: 'POST' });
-    if (result.ok && result.data) {
-        setToken(result.data.token);
-        currentUser = result.data.user;
-        applyServerProgress(result.data.progress);
-        await syncProgress();
-        hideOverlayStartGame();
-    } else {
-        showStartError('Failed to create guest session. Is the server running?');
     }
 }
 
@@ -514,13 +499,9 @@ for (const nation of nations) {
 saveUnlockedTanks();
 
 const background = new Image();
-background.src = "assets/field.png";
 const germanField = new Image();
-germanField.src = "assets/germanfield.png";
 const ussrField = new Image();
-ussrField.src = "assets/ussrfield.png";
 const usaField = new Image();
-usaField.src = "assets/usafield.png";
 let activeMapConfig = null;
 let battleObstacleMap = null;
 let battleMapWidth = 0;
@@ -538,6 +519,68 @@ let debugObstacleReady = false;
 let battleFieldImg = new Image();
 let battleLayoutImg = new Image();
 
+function trackBattleMapLoad(img) {
+    loadingTotal++;
+    updateLoadingProgress();
+    const orig = img.onload;
+    img.onload = () => { orig?.(); loadingLoaded++; updateLoadingProgress(); tryStartGame(); };
+    img.onerror = () => { loadingLoaded++; updateLoadingProgress(); tryStartGame(); };
+}
+
+function loadDefaultBattleMap() {
+    battleFieldImg.onload = () => {
+        battleWorldWidth = Math.round(battleFieldImg.naturalWidth * BATTLE_WORLD_SCALE);
+        battleWorldHeight = Math.round(battleFieldImg.naturalHeight * BATTLE_WORLD_SCALE);
+    };
+    battleLayoutImg.onload = () => {
+        const offscreen = document.createElement("canvas");
+        offscreen.width = battleLayoutImg.naturalWidth;
+        offscreen.height = battleLayoutImg.naturalHeight;
+        const offCtx = offscreen.getContext("2d");
+        offCtx.drawImage(battleLayoutImg, 0, 0);
+        const data = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
+        battleMapWidth = offscreen.width;
+        battleMapHeight = offscreen.height;
+        battleObstacleMap = new Uint8Array(battleMapWidth * battleMapHeight);
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+            const idx = i / 4;
+            battleObstacleMap[idx] = (g > r && g > b && g > 60) || (b > r && b > g && b > 60) ? 1 : 0;
+        }
+        debugObstacleCanvas = document.createElement("canvas");
+        debugObstacleCanvas.width = battleMapWidth;
+        debugObstacleCanvas.height = battleMapHeight;
+        const dCtx = debugObstacleCanvas.getContext("2d");
+        const imgData = dCtx.createImageData(battleMapWidth, battleMapHeight);
+        for (let i = 0; i < battleObstacleMap.length; i++) {
+            if (battleObstacleMap[i]) {
+                imgData.data[i * 4 + 0] = 220;
+                imgData.data[i * 4 + 1] = 30;
+                imgData.data[i * 4 + 2] = 30;
+                imgData.data[i * 4 + 3] = 120;
+            }
+        }
+        dCtx.putImageData(imgData, 0, 0);
+        battleDebugOverlay = debugObstacleCanvas;
+        debugObstacleReady = true;
+        checkBattleReady();
+        for (const tank of fieldTanks.battle) {
+            if (isBattleObstacle(tank.x, tank.y)) {
+                let tries = 0;
+                while (isBattleObstacle(tank.x, tank.y) && tries < 40) {
+                    tank.x += (Math.random() - 0.5) * 100;
+                    tank.y += (Math.random() - 0.5) * 100;
+                    tries++;
+                }
+            }
+        }
+    };
+    trackBattleMapLoad(battleFieldImg);
+    battleFieldImg.src = "assets/map_base.png";
+    trackBattleMapLoad(battleLayoutImg);
+    battleLayoutImg.src = "assets/map_layout.png";
+}
+
 async function loadActiveMap() {
     try {
         const res = await fetch('/api/map/active');
@@ -546,62 +589,61 @@ async function loadActiveMap() {
             BATTLE_WORLD_SCALE = activeMapConfig.world_scale || 2.5;
             battleFieldImg = new Image();
             battleLayoutImg = new Image();
+            battleFieldImg.onload = () => {
+                battleWorldWidth = Math.round(battleFieldImg.naturalWidth * BATTLE_WORLD_SCALE);
+                battleWorldHeight = Math.round(battleFieldImg.naturalHeight * BATTLE_WORLD_SCALE);
+            };
+            trackBattleMapLoad(battleFieldImg);
             battleFieldImg.src = "assets/" + activeMapConfig.base_image;
+            battleLayoutImg.onload = () => {
+                const offscreen = document.createElement("canvas");
+                offscreen.width = battleLayoutImg.naturalWidth;
+                offscreen.height = battleLayoutImg.naturalHeight;
+                const offCtx = offscreen.getContext("2d");
+                offCtx.drawImage(battleLayoutImg, 0, 0);
+                const data = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
+                battleMapWidth = offscreen.width;
+                battleMapHeight = offscreen.height;
+                battleObstacleMap = new Uint8Array(battleMapWidth * battleMapHeight);
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i], g = data[i + 1], b = data[i + 2];
+                    const idx = i / 4;
+                    battleObstacleMap[idx] = (g > r && g > b && g > 60) || (b > r && b > g && b > 60) ? 1 : 0;
+                }
+                debugObstacleCanvas = document.createElement("canvas");
+                debugObstacleCanvas.width = battleMapWidth;
+                debugObstacleCanvas.height = battleMapHeight;
+                const dCtx = debugObstacleCanvas.getContext("2d");
+                const imgData = dCtx.createImageData(battleMapWidth, battleMapHeight);
+                for (let i = 0; i < battleObstacleMap.length; i++) {
+                    if (battleObstacleMap[i]) {
+                        imgData.data[i * 4 + 0] = 220;
+                        imgData.data[i * 4 + 1] = 30;
+                        imgData.data[i * 4 + 2] = 30;
+                        imgData.data[i * 4 + 3] = 120;
+                    }
+                }
+                dCtx.putImageData(imgData, 0, 0);
+                battleDebugOverlay = debugObstacleCanvas;
+                debugObstacleReady = true;
+                checkBattleReady();
+                for (const tank of fieldTanks.battle) {
+                    if (isBattleObstacle(tank.x, tank.y)) {
+                        let tries = 0;
+                        while (isBattleObstacle(tank.x, tank.y) && tries < 40) {
+                            tank.x += (Math.random() - 0.5) * 100;
+                            tank.y += (Math.random() - 0.5) * 100;
+                            tries++;
+                        }
+                    }
+                }
+            };
+            trackBattleMapLoad(battleLayoutImg);
             battleLayoutImg.src = "assets/" + activeMapConfig.layout_image;
+            return;
         }
     } catch {}
-    if (!activeMapConfig) {
-        battleFieldImg.src = "assets/map_base.png";
-        battleLayoutImg.src = "assets/map_layout.png";
-    }
-    battleFieldImg.onload = () => {
-        battleWorldWidth = Math.round(battleFieldImg.naturalWidth * BATTLE_WORLD_SCALE);
-        battleWorldHeight = Math.round(battleFieldImg.naturalHeight * BATTLE_WORLD_SCALE);
-    };
-    battleLayoutImg.onload = () => {
-    const offscreen = document.createElement("canvas");
-    offscreen.width = battleLayoutImg.naturalWidth;
-    offscreen.height = battleLayoutImg.naturalHeight;
-    const offCtx = offscreen.getContext("2d");
-    offCtx.drawImage(battleLayoutImg, 0, 0);
-    const data = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
-    battleMapWidth = offscreen.width;
-    battleMapHeight = offscreen.height;
-    battleObstacleMap = new Uint8Array(battleMapWidth * battleMapHeight);
-    for (let i = 0; i < data.length; i += 4) {
-        const r = data[i], g = data[i + 1], b = data[i + 2];
-        const idx = i / 4;
-        battleObstacleMap[idx] = (g > r && g > b && g > 60) || (b > r && b > g && b > 60) ? 1 : 0;
-    }
-    // Pre-render obstacle overlay for debug mode
-    const debugCanvas = document.createElement("canvas");
-    debugCanvas.width = battleMapWidth;
-    debugCanvas.height = battleMapHeight;
-    const dCtx = debugCanvas.getContext("2d");
-    const imgData = dCtx.createImageData(battleMapWidth, battleMapHeight);
-    for (let i = 0; i < battleObstacleMap.length; i++) {
-        if (battleObstacleMap[i]) {
-            imgData.data[i * 4 + 0] = 220;
-            imgData.data[i * 4 + 1] = 30;
-            imgData.data[i * 4 + 2] = 30;
-            imgData.data[i * 4 + 3] = 120;
-        }
-    }
-    dCtx.putImageData(imgData, 0, 0);
-    battleDebugOverlay = debugCanvas;
-    debugObstacleReady = true;
-    checkBattleReady();
-    for (const tank of fieldTanks.battle) {
-        if (isBattleObstacle(tank.x, tank.y)) {
-            let tries = 0;
-            while (isBattleObstacle(tank.x, tank.y) && tries < 40) {
-                tank.x += (Math.random() - 0.5) * 100;
-                tank.y += (Math.random() - 0.5) * 100;
-                tries++;
-            }
-        }
-    }
-    };
+    loadDefaultBattleMap();
 }
 
 loadActiveMap();
@@ -623,6 +665,23 @@ const tankHitboxData = {};
 let loadingTotal = 0;
 let loadingLoaded = 0;
 let authReady = false;
+
+function trackImageLoad(img, src) {
+    loadingTotal++;
+    updateLoadingProgress();
+    img.onload = img.onerror = () => { loadingLoaded++; updateLoadingProgress(); tryStartGame(); };
+    img.src = src;
+}
+
+function trackAudioLoad(audio, src) {
+    loadingTotal++;
+    updateLoadingProgress();
+    const done = () => { loadingLoaded++; updateLoadingProgress(); tryStartGame(); };
+    audio.oncanplaythrough = done;
+    audio.onerror = done;
+    audio.src = src;
+    audio.load();
+}
 
 function updateLoadingProgress() {
     const inner = document.getElementById('loadingBarInner');
@@ -651,6 +710,21 @@ function preloadAllAssets() {
     }
     if (!loaded.has(`${SECRET_TANK_NATION}:tank:${SECRET_TANK_TIER}`)) {
         getTankImage(SECRET_TANK_NATION, SECRET_TANK_TIER, 'tank');
+    }
+
+    trackImageLoad(background, "assets/field.png");
+    trackImageLoad(germanField, "assets/germanfield.png");
+    trackImageLoad(ussrField, "assets/ussrfield.png");
+    trackImageLoad(usaField, "assets/usafield.png");
+
+    for (const n of nations) {
+        trackImageLoad(new Image(), `assets/${n}flag.png`);
+    }
+
+    trackAudioLoad(engineSound, "assets/engine.mp3");
+
+    for (const s of ["assets/merge.wav", "assets/collide.wav", "assets/shoot.wav", "assets/hit.wav"]) {
+        trackAudioLoad(new Audio(), s);
     }
 }
 
@@ -1213,7 +1287,7 @@ class Tank {
         this.topSpeed = (2.0 + weightFactor * 2.0) * classFactor;
         this.speed = 0;
         this.acceleration = 0.02 + weightFactor * 0.03;
-        this.braking = 0.06 + weightFactor * 0.04;
+        this.braking = 0.12 + weightFactor * 0.06;
         this.pivotTurnRate = 0.055;
         this.minTurnRate = 0.01 + weightFactor * 0.04;
         this.turnSpeed = 0;
@@ -1324,6 +1398,20 @@ class Tank {
                     this.x = oldX;
                     this.y = newY;
                 } else {
+                    let step = 0;
+                    const stepX = (newX - oldX) * 0.05;
+                    const stepY = (newY - oldY) * 0.05;
+                    while (step < 20) {
+                        step++;
+                        const sx = newX - stepX * step;
+                        const sy = newY - stepY * step;
+                        if (!this._overlapsAt(sx, sy)) {
+                            this.x = sx;
+                            this.y = sy;
+                            this.speed *= 0.3;
+                            return;
+                        }
+                    }
                     this.x = oldX;
                     this.y = oldY;
                     this.speed = 0;
@@ -1346,7 +1434,7 @@ class Tank {
                     this.x = pushX;
                     this.y = pushY;
                 }
-                this.speed *= 0.5;
+                this.speed *= 0.3;
             }
             this.x = Math.max(radius, Math.min(battleWorldWidth - radius, this.x));
             this.y = Math.max(radius, Math.min(battleWorldHeight - radius, this.y));
@@ -1897,7 +1985,7 @@ function handleCollision(a, b, firstIndex, secondIndex) {
                     tank.y = Math.max(-hw, Math.min(canvas.height + hw, tank.y));
                 };
                 clamp(a); clamp(b);
-                a.speed *= 0.5; b.speed *= 0.5;
+                a.speed *= 0.3; b.speed *= 0.3;
                 const turnSpeed = 0.06;
                 for (const [tank, target] of [[a, angle + Math.PI], [b, angle]]) {
                     let diff = target - tank.angle;
@@ -2882,23 +2970,7 @@ function applyHitboxOverrides() {
 }
 loadHitboxOverrides();
 
-const loadingOverlay = document.getElementById('loadingOverlay');
-const startOverlay = document.getElementById('startOverlay');
-if (getToken()) {
-    setTimeout(() => {
-        if (!authReady) {
-            loadingOverlay.classList.add('hidden');
-            startOverlay.classList.remove('hidden');
-        }
-    }, 3000);
-} else {
-    setTimeout(() => {
-        if (!authReady) {
-            loadingOverlay.classList.add('hidden');
-            startOverlay.classList.remove('hidden');
-        }
-    }, 600);
-}
+
 
 canvas.addEventListener("mousemove", (event) => { mouse.x = event.clientX; mouse.y = event.clientY; });
 canvas.addEventListener("mousedown", (event) => {
@@ -3133,7 +3205,7 @@ function cancelRename() {
 function showDialog(dialog) { dialog.classList.remove("hidden"); isPaused = true; }
 function hideDialog(dialog) { dialog.classList.add("hidden"); }
 function closeAllDialogs() {
-    hideDialog(pauseDialog); hideDialog(explodeDialog); hideDialog(resetDialog); hideDialog(adminDialog); hideDialog(battleConfirmDialog); hideDialog(destroyedDialog); hideDialog(beatGameDialog);
+    hideDialog(pauseDialog); hideDialog(explodeDialog); hideDialog(resetDialog); hideDialog(adminDialog); hideDialog(battleConfirmDialog); hideDialog(destroyedDialog); hideDialog(beatGameDialog); hideDialog(instructionsDialog);
     adminError.classList.add("hidden"); adminPassword.value = "";
     isPaused = false;
 }
@@ -3166,6 +3238,115 @@ document.addEventListener("click", (event) => {
 
 pauseButton.addEventListener("click", () => { if (!isPaused) showDialog(pauseDialog); else closeAllDialogs(); });
 resumeButton.addEventListener("click", closeAllDialogs);
+const i18n = {
+    en: {
+        title: "How to Play",
+        goalTitle: "➤ Goal",
+        goalDesc: 'Collect all <strong>60 tanks</strong> (10 tiers × 2 classes × 3 nations) to unlock the <strong>secret Super-Tank</strong>. Find a way to summon and destroy it to beat the game!',
+        goalStep1: "Unlock all 60 tanks",
+        goalStep2: "Unlock the Secret Tank",
+        goalStep3: "Find a way to destroy it",
+        mergeTitle: "➤ Merging & Destruction",
+        mergeDesc: "Tanks merge or explode when they touch — either by dragging them together or letting them collide on their own.",
+        tier: "Tier 1",
+        tier1: "Tier 1",
+        tierResult: "Tier 2",
+        mergeRule1Label: "Same nation, same class, same tier:",
+        mergeRule1: "Merge into the next tier.",
+        mergeRule2Label: "Same nation, different tier/class:",
+        mergeRule2: "Bump apart.",
+        mergeRule3Label: "Different nations:",
+        mergeRule3: "The higher tier destroys the lower one. Same tier, different class — the TD wins. Same tier, same class — both explode.",
+        mergeHint: "Each nation has unique tank and tank destroyer (TD) lines. Earn new tanks by merging them on the field.",
+        tameTitle: "➤ Taming tanks",
+        tameDesc: 'Click the main field to spawn a random Tier 1 tank. Drag a tank onto the <span class="inlineIcon">📦</span> box to send it to its nation\'s field.',
+        tameHint: 'Tanks on nation fields don\'t interact with each other. Use the <strong>☰</strong> button to view unlocked tanks. Tanks on nation fields are your pets. Love them.',
+        battleTitle: "➤ Sending to Battle",
+        battleDesc: 'On a nation field, select a tank and press <kbd>Enter</kbd> (or click the ⚔ button) to send it to battle. You can chat with other players or kill them. Your choice.',
+        battleStep1: "Select a tank",
+        battleStep2: 'Press <kbd>Enter</kbd>',
+        battleStep3: "Explore!",
+        battleHint: 'Switch between the main field and nation fields using the <strong>📦</strong> button. Use the <strong>←</strong> button to return to the main field.',
+        closeBtn: "Got it!",
+    },
+    es: {
+        title: "Cómo Jugar",
+        goalTitle: "➤ Objetivo",
+        goalDesc: 'Colecciona los <strong>60 tanques</strong> (10 niveles × 2 clases × 3 naciones) para desbloquear el <strong>Super-Tanque secreto</strong>. Encuentra una forma de invocarlo y destrúyelo para ganar.',
+        goalStep1: "Desbloquea los 60 tanques",
+        goalStep2: "Desbloquea el Tanque Secreto",
+        goalStep3: "Encuentra cómo destruirlo",
+        mergeTitle: "➤ Fusión y Destrucción",
+        mergeDesc: "Los tanques se fusionan o explotan al tocarse, ya sea arrastrándolos o dejando que choquen solos.",
+        tier: "Nivel 1",
+        tier1: "Nivel 1",
+        tierResult: "Nivel 2",
+        mergeRule1Label: "Misma nación, misma clase, mismo nivel:",
+        mergeRule1: "Se fusionan al siguiente nivel.",
+        mergeRule2Label: "Misma nación, diferente nivel/clase:",
+        mergeRule2: "Rebotan.",
+        mergeRule3Label: "Diferentes naciones:",
+        mergeRule3: "El nivel superior destruye al inferior. Mismo nivel, diferente clase — gana el TD. Mismo nivel, misma clase — ambos explotan.",
+        mergeHint: "Cada nación tiene líneas de tanques y cazatanques (TD) únicas. Consigue nuevos tanques fusionándolos en el campo.",
+        tameTitle: "➤ Dómar tanques",
+        tameDesc: 'Haz clic en el campo principal para generar un tanque aleatorio de Nivel 1. Arrastra un tanque a la caja <span class="inlineIcon">📦</span> para enviarlo al campo de su nación.',
+        tameHint: 'Los tanques en campos nacionales no interactúan entre sí. Usa el botón <strong>☰</strong> para ver los tanques desbloqueados. Los tanques en campos nacionales son tus mascotas. Ámalos.',
+        battleTitle: "➤ Batalla",
+        battleDesc: 'En un campo nacional, selecciona un tanque y presiona <kbd>Enter</kbd> (o haz clic en ⚔) para enviarlo a batalla. Puedes chatear con otros jugadores o matarlos. Tú decides.',
+        battleStep1: "Selecciona un tanque",
+        battleStep2: 'Presiona <kbd>Enter</kbd>',
+        battleStep3: "¡Explora!",
+        battleHint: 'Cambia entre el campo principal y los campos nacionales con el botón <strong>📦</strong>. Usa el botón <strong>←</strong> para volver al campo principal.',
+        closeBtn: "¡Entendido!",
+    },
+    ru: {
+        title: "Как играть?",
+        goalTitle: "➤ Цель",
+        goalDesc: 'Собери все <strong>60 танков</strong> (10 уровней × 2 класса × 3 нации), чтобы открыть <strong>секретный танк</strong>. Найди способ призвать и уничтожить его, чтобы пройти игру!',
+        goalStep1: "Откройте все 60 танков",
+        goalStep2: "Откройте секретный танк",
+        goalStep3: "Уничтожте его",
+        mergeTitle: "➤ Разблокировка и Уничтожение",
+        mergeDesc: "Танки смешиваются или взрываются при соприкосновении — либо перетаскиванием, либо при столкновении самих танков.",
+        tier: "Уровень 1",
+        tier1: "Уровень 1",
+        tierResult: "Уровень 2",
+        mergeRule1Label: "Одна нация, один класс, один уровень:",
+        mergeRule1: "Сливаются в следующий уровень.",
+        mergeRule2Label: "Одна нация, разные уровень/класс:",
+        mergeRule2: "Отталкиваются.",
+        mergeRule3Label: "Разные нации:",
+        mergeRule3: "Высший уровень уничтожает низший. Одинаковый уровень, разные классы — ПТ-САУ побеждает. Одинаковый уровень и класс — оба взрываются.",
+        mergeHint: "У каждой нации уникальные ветки обычных танков и ПТ-САУ. Зарабатывайте новые танки, сливая их на поле.",
+        tameTitle: "➤ Приручение танков",
+        tameDesc: 'Кликните по основному полю, чтобы создать случайный танк 1-го уровня. Перетащите танк в коробку <span class="inlineIcon">📦</span>, чтобы отправить его на поле его нации.',
+        tameHint: 'Танки на полях наций не взаимодействуют друг с другом. Используйте кнопку <strong>☰</strong>, чтобы посмотреть открытые танки. Танки на полях наций — ваши дети. Любите их.',
+        battleTitle: "➤ Бой",
+        battleDesc: 'На поле нации выберите танк и нажмите <kbd>Enter</kbd> (или кнопку ⚔), чтобы отправить его в бой. Вы можете общаться с другими игроками или убивать их. Ваш выбор.',
+        battleStep1: "Выберите танк",
+        battleStep2: 'Нажмите <kbd>Enter</kbd>',
+        battleStep3: "Исследуйте!",
+        battleHint: 'Переключайтесь между основным полем и полями наций кнопкой <strong>📦</strong>. Используйте кнопку <strong>←</strong>, чтобы вернуться на основное поле.',
+        closeBtn: "Понятно!",
+    },
+};
+
+let currentLang = "en";
+
+function applyLanguage(lang) {
+    currentLang = lang;
+    document.querySelectorAll(".langBtn").forEach(b => b.classList.toggle("langActive", b.dataset.lang === lang));
+    const t = i18n[lang];
+    for (const [key, text] of Object.entries(t)) {
+        document.querySelectorAll(`[data-i18n="${key}"]`).forEach(el => el.innerHTML = text);
+    }
+}
+
+instructionsButton.addEventListener("click", () => { showDialog(instructionsDialog); applyLanguage(currentLang); });
+closeInstructionsButton.addEventListener("click", () => { hideDialog(instructionsDialog); isPaused = false; });
+document.querySelectorAll(".langBtn").forEach(btn => {
+    btn.addEventListener("click", () => applyLanguage(btn.dataset.lang));
+});
 
 openExplodeDialogButton.addEventListener("click", () => { if (currentField) return; showDialog(explodeDialog); hideDialog(pauseDialog); });
 function updateExplodeButton() { openExplodeDialogButton.disabled = !!currentField; }
@@ -3290,7 +3471,6 @@ confirmBeatGameButton.addEventListener('click', () => {
     isPaused = false;
 });
 
-document.getElementById('guestButton').addEventListener('click', startAsGuest);
 document.getElementById('startLoginBtn').addEventListener('click', startLogin);
 document.getElementById('startRegisterBtn').addEventListener('click', startRegister);
 document.getElementById('startUsername').addEventListener('keydown', e => { if (e.key === 'Enter') startLogin(); });

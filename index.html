@@ -27,8 +27,6 @@
         <div class="startBox">
             <h1>Tank Evolution</h1>
             <p class="startSubtitle">Merge tanks and dominate the field!</p>
-            <button id="guestButton" class="startBtn" type="button">Play as Guest</button>
-            <div class="startDivider"><span>or</span></div>
             <label class="startLabel" for="startUsername">Username</label>
             <input id="startUsername" type="text" autocomplete="username" placeholder="Enter username">
             <label class="startLabel" for="startPassword">Password</label>
@@ -45,6 +43,7 @@
     <div id="gameUI" class="hidden">
         <button id="unlockToggleButton" type="button" aria-label="Unlocked tanks" title="Unlocked tanks">☰</button>
         <button id="pauseButton" type="button" aria-label="Pause game" title="Pause game">⏸</button>
+        <button id="instructionsButton" type="button" aria-label="How to play" title="How to play">?</button>
 
         <div id="clickCounter">Spawns: 0</div>
         <div id="unlockCounter">0/60</div>
@@ -141,6 +140,88 @@
                 <h2 id="beatGameTitle">You beat the game!</h2>
                 <p id="beatGameMessage">Was it worth it?</p>
                 <div class="dialogActions"><button id="confirmBeatGameButton" type="button">nah🥀</button></div>
+            </section>
+        </div>
+
+        <div id="instructionsDialog" class="dialogBackdrop hidden" role="presentation">
+            <section class="instructionsDialog" role="dialog" aria-modal="true" aria-labelledby="instructionsTitle">
+                <div class="instructionsHeader">
+                    <h2 id="instructionsTitle" data-i18n="title">How to Play</h2>
+                    <div class="langButtons">
+                        <button type="button" class="langBtn langActive" data-lang="en">EN</button>
+                        <button type="button" class="langBtn" data-lang="es">ES</button>
+                        <button type="button" class="langBtn" data-lang="ru">RU</button>
+                    </div>
+                </div>
+                <div class="instructionsContent">
+                    <div class="instructionSection">
+                        <h3 data-i18n="goalTitle">➤ Goal</h3>
+                        <p data-i18n="goalDesc">Collect all <strong>60 tanks</strong> (10 tiers × 2 classes × 3 nations) to unlock the <strong>secret Super-Tank</strong>. Find a way to summon and destroy it to beat the game!</p>
+                        <div class="goalDiagram">
+                            <div class="goalStep">
+                                <div class="goalIcon">🔓</div>
+                                <span data-i18n="goalStep1">Unlock all 60 tanks</span>
+                            </div>
+                            <div class="goalArrow">→</div>
+                            <div class="goalStep">
+                                <div class="goalIcon">🐀</div>
+                                <span data-i18n="goalStep2">Unlock the Secret Tank</span>
+                            </div>
+                            <div class="goalArrow">→</div>
+                            <div class="goalStep">
+                                <div class="goalIcon">💥</div>
+                                <span data-i18n="goalStep3">Find a way to destroy it</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="instructionSection">
+                        <h3 data-i18n="mergeTitle">➤ Merging & Destruction</h3>
+                        <p data-i18n="mergeDesc">Tanks merge or explode when they touch — either by dragging them together or letting them collide on their own.</p>
+                        <div class="mergeDiagram">
+                            <div class="mergeTank" data-i18n="tier1">Tier 1</div>
+                            <span class="mergePlus">+</span>
+                            <div class="mergeTank" data-i18n="tier1">Tier 1</div>
+                            <span class="mergeArrow">→</span>
+                            <div class="mergeTank mergeResult" data-i18n="tierResult">Tier 2</div>
+                        </div>
+                        <p><strong data-i18n="mergeRule1Label">Same nation, same class, same tier:</strong> <span data-i18n="mergeRule1">Merge into the next tier.</span></p>
+                        <p><strong data-i18n="mergeRule2Label">Same nation, different tier/class:</strong> <span data-i18n="mergeRule2">Bump apart.</span></p>
+                        <p><strong data-i18n="mergeRule3Label">Different nations:</strong> <span data-i18n="mergeRule3">The higher tier destroys the lower one. Same tier, different class — the TD wins. Same tier, same class — both explode.</span></p>
+                        <p class="instructionHint" data-i18n="mergeHint">Each nation has unique tank and tank destroyer (TD) lines. Earn new tanks by merging them on the field.</p>
+                    </div>
+                    <div class="instructionSection">
+                        <h3 data-i18n="tameTitle">➤ Taming tanks</h3>
+                        <p data-i18n="tameDesc">Click the main field to spawn a random Tier 1 tank. Drag a tank onto the <span class="inlineIcon">📦</span> box to send it to its nation's field.</p>
+                        <div class="fieldDiagram">
+                            <div class="fieldBox" style="border-color:#4f86ff">🇺🇸 USA</div>
+                            <div class="fieldBox" style="border-color:#ff6a3d">🇷🇺 USSR</div>
+                            <div class="fieldBox" style="border-color:#4caf50">🇩🇪 Germany</div>
+                        </div>
+                        <p class="instructionHint" data-i18n="tameHint">Tanks on nation fields don't interact with each other. Use the <strong>☰</strong> button to view unlocked tanks. Tanks on nation fields are your pets. Love them.</p>
+                    </div>
+                    <div class="instructionSection">
+                        <h3 data-i18n="battleTitle">➤ Sending to Battle</h3>
+                        <p data-i18n="battleDesc">On a nation field, select a tank and press <kbd>Enter</kbd> (or click the ⚔ button) to send it to battle. You can chat with other players or kill them. Your choice.</p>
+                        <div class="battleDiagram">
+                            <div class="battleStep">
+                                <div class="battleIcon">🎯</div>
+                                <span data-i18n="battleStep1">Select a tank</span>
+                            </div>
+                            <div class="battleArrow">→</div>
+                            <div class="battleStep">
+                                <div class="battleIcon">⚔️</div>
+                                <span data-i18n="battleStep2">Press <kbd>Enter</kbd></span>
+                            </div>
+                            <div class="battleArrow">→</div>
+                            <div class="battleStep">
+                                <div class="battleIcon">✨</div>
+                                <span data-i18n="battleStep3">Explore!</span>
+                            </div>
+                        </div>
+                        <p class="instructionHint" data-i18n="battleHint">Switch between the main field and nation fields using the <strong>📦</strong> button. Use the <strong>←</strong> button to return to the main field.</p>
+                    </div>
+                </div>
+                <div class="dialogActions"><button id="closeInstructionsButton" type="button" class="resumeButton" data-i18n="closeBtn">Got it!</button></div>
             </section>
         </div>
     </div>
