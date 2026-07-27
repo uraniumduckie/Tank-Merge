@@ -723,7 +723,7 @@ function preloadAllAssets() {
 
     trackAudioLoad(engineSound, "assets/engine.mp3");
 
-    for (const s of ["assets/merge.wav", "assets/collide.wav", "assets/shoot.wav", "assets/hit.wav"]) {
+    for (const s of ["assets/merge.wav", "assets/collide.wav", "assets/shoot.wav", "assets/hit.wav", "assets/spawn.wav"]) {
         trackAudioLoad(new Audio(), s);
     }
 }
@@ -2196,13 +2196,15 @@ let isChatOpen = false;
 let ws = null;
 let lastStateSend = 0;
 const keys = { w: false, a: false, s: false, d: false };
+const keyMap = { KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd' };
 
 document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
     const key = e.key.toLowerCase();
-    if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
+    const mapped = keyMap[e.code];
+    if (mapped) {
         e.preventDefault();
-        keys[key] = true;
+        keys[mapped] = true;
         if (currentField === 'battle' && playerBattleTank && ws && ws.readyState === WebSocket.OPEN) {
             sendBattleState();
         }
@@ -2261,10 +2263,10 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('keyup', (e) => {
     if (e.target.tagName === 'INPUT') return;
-    const key = e.key.toLowerCase();
-    if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
+    const mapped = keyMap[e.code];
+    if (mapped) {
         e.preventDefault();
-        keys[key] = false;
+        keys[mapped] = false;
         if (currentField === 'battle' && playerBattleTank && ws && ws.readyState === WebSocket.OPEN) {
             sendBattleState();
         }
@@ -2512,7 +2514,9 @@ function handlePlayerHit(msg) {
                 destroyedTankNation = playerBattleTank.nation;
                 if (!fieldTanks[destroyedTankNation]) fieldTanks[destroyedTankNation] = [];
                 fieldTanks[destroyedTankNation].push(playerBattleTank);
-                fieldTanks.battle = fieldTanks.battle.filter(t => t !== playerBattleTank);
+                const deadIdx = fieldTanks.battle.indexOf(playerBattleTank);
+                if (deadIdx !== -1) fieldTanks.battle.splice(deadIdx, 1);
+                tanks = fieldTanks.battle;
                 playerBattleTank = null;
                 enemyPlayers = [];
                 battleTracks = [];
@@ -3006,6 +3010,7 @@ canvas.addEventListener("mousedown", (event) => {
     const options = getSpawnableVehicles();
     const choice = options[Math.floor(Math.random() * options.length)];
     tanks.push(new Tank(choice.nation, 1, event.clientX, event.clientY, false, undefined, choice.vehicleClass));
+    playSound("assets/spawn.wav");
     getTankImage(choice.nation, 2, choice.vehicleClass);
     saveTanks();
 });
@@ -3480,12 +3485,10 @@ document.getElementById('startPassword').addEventListener('input', () => documen
 
 document.addEventListener("keydown", (e) => {
     if (e.target.tagName === 'INPUT') return;
-    const key = e.key.toLowerCase();
-    
-    // WASD for movement
-    if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
+    const mapped = keyMap[e.code];
+    if (mapped) {
         e.preventDefault();
-        keys[key] = true;
+        keys[mapped] = true;
     }
 });
 
