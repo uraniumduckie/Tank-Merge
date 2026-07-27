@@ -723,7 +723,7 @@ function preloadAllAssets() {
 
     trackAudioLoad(engineSound, "assets/engine.mp3");
 
-    for (const s of ["assets/merge.wav", "assets/collide.wav", "assets/shoot.wav", "assets/hit.wav", "assets/spawn.wav"]) {
+    for (const s of ["assets/merge.wav", "assets/collide.wav", "assets/shoot.wav", "assets/hit.wav"]) {
         trackAudioLoad(new Audio(), s);
     }
 }
